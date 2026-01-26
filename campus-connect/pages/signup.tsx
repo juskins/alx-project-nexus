@@ -7,6 +7,8 @@ const Signup = () => {
    const [userType, setUserType] = useState('jobSeeker');
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
+   const [confirmPassword, setConfirmPassword] = useState('');
+   const [showPassword, setShowPassword] = useState({password: false, confirmPassword: false});
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -63,15 +65,49 @@ const Signup = () => {
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                            Password
                         </label>
-                        <input
-                           type="password"
-                           id="password"
-                           value={password}
-                           onChange={(e) => setPassword(e.target.value)}
-                           placeholder="Enter your password"
-                           className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
-                           required
-                        />
+                        <div className="relative">
+                           <input
+                              type={showPassword.password ? "text" : "password"}
+                              id="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Enter your password"
+                              className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
+                              required
+                           />
+                           <button
+                              type="button"
+                              onClick={() => setShowPassword({...showPassword, password: !showPassword.password})}
+                              className="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-400"
+                           >
+                              {showPassword ? 'Hide' : 'Show'}
+                           </button>
+                        </div>
+                     </div>
+
+                     {/* Confirm Password Input */}
+                     <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                           Confirm Password
+                        </label>
+                        <div className="relative">
+                           <input
+                              type={showPassword.confirmPassword ? "text" : "password"}
+                              id="confirmPassword"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Confirm your password"
+                              className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
+                              required
+                           />
+                           <button
+                              type="button"
+                              onClick={() => setShowPassword({...showPassword, confirmPassword: !showPassword.confirmPassword})}
+                              className="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-400"
+                           >
+                              {showPassword.confirmPassword ? 'Hide' : 'Show'}
+                           </button>
+                        </div>
                      </div>
 
                      {/* Login Button */}
@@ -79,7 +115,7 @@ const Signup = () => {
                         type="submit"
                         className="w-full bg-brand-green gap-4 items-center flex justify-center cursor-pointer hover:bg-brand-color text-white font-semibold py-3 rounded-lg transition-colors"
                      >
-                        <UniversityIcon className="ml-2" />
+                        <UniversityIcon className="ml-2" size={20} />
                         <span>Sign Up with University Email</span>
                      </button>
 
