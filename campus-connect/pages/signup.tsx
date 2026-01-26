@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { Mail, University, UniversityIcon } from 'lucide-react';
+import Image from 'next/image';
 
-
-const Login = () => {
+const Signup = () => {
+   const [userType, setUserType] = useState('jobSeeker');
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
+      console.log('Login:', { userType, email, password });
    };
 
    return (
@@ -20,7 +23,7 @@ const Login = () => {
                {/* Background image slideshow */}
                <div className="absolute inset-0 w-full h-full">
                   {/* Campus illustration placeholder */}
-                  <div className="w-full h-full bg-cover bg-bottom" style={{backgroundImage: "url('/assets/images/loginBg.png')"}}>
+                  <div className="w-full h-full bg-cover bg-bottom" style={{ backgroundImage: "url('/assets/images/loginBg.png')" }}>
                   </div>
                </div>
             </div>
@@ -31,14 +34,14 @@ const Login = () => {
                   {/* Header */}
                   <div className="text-center mb-8">
                      <h1 className="text-2xl font-bold text-gray-900 mb-3 ">
-                        Welcome Back!
+                        Create Your Account
                      </h1>
                      <p className="text-gray-600">
-                        Sign in to find your next campus job.
+                        Join CampusConnect and start your journey today!
                      </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="md:space-y-4 space-y-4">
+                  <form onSubmit={handleSubmit} className="md:space-y-6 space-y-4">
                      {/* Email Input */}
                      <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -69,22 +72,64 @@ const Login = () => {
                            className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
                            required
                         />
-                        <div className="text-right mt-2">
-                           <Link href="/forgot-password" className="text-sm text-brand-green font-medium hover:text-brand-green">
-                              Forgot Password?
-                           </Link>
-                        </div>
                      </div>
 
                      {/* Login Button */}
                      <button
                         type="submit"
-                        className="w-full bg-brand-color cursor-pointer hover:bg-brand-green text-white font-semibold py-3 rounded-lg transition-colors"
+                        className="w-full bg-brand-green gap-4 items-center flex justify-center cursor-pointer hover:bg-brand-color text-white font-semibold py-3 rounded-lg transition-colors"
                      >
-                        Login
+                        <UniversityIcon className="ml-2" />
+                        <span>Sign Up with University Email</span>
                      </button>
 
-                     
+                     {/* User Type Selection */}
+                     <div className='flex items-center gap-2'>
+                        <label className="block text-sm font-medium text-gray-700">
+                           I am a
+                        </label>
+                        <div className="flex gap-6 text-sm">
+                           <label className="flex items-center cursor-pointer">
+                              <input
+                                 type="radio"
+                                 name="userType"
+                                 value="jobSeeker"
+                                 checked={userType === 'jobSeeker'}
+                                 onChange={(e) => setUserType(e.target.value)}
+                                 className="w-4 h-4 text-brand-color border-gray-300 focus:ring-brand-color accent-brand-color"
+                              />
+                              <span className="ml-2 text-gray-700">Job Seeker</span>
+                           </label>
+                           <label className="flex items-center cursor-pointer">
+                              <input
+                                 type="radio"
+                                 name="userType"
+                                 value="jobPoster"
+                                 checked={userType === 'jobPoster'}
+                                 onChange={(e) => setUserType(e.target.value)}
+                                 className="w-4 h-4 text-brand-color border-gray-300 focus:ring-brand-color accent-brand-color"
+                              />
+                              <span className="ml-2 text-gray-700">Job Poster</span>
+                           </label>
+                        </div>
+                     </div>
+
+                     <div className='flex gap-2 items-center'>
+                        <input
+                           type="checkbox"
+                           id="terms"
+                           required
+                           className="w-4 h-4 text-brand-color border-gray-300 focus:ring-brand-color accent-brand-color"
+                        />
+                        <label className="block text-sm font-medium text-gray-700">
+                           I agree to the
+                           <Link href="/terms" className="text-brand-color font-medium hover:text-brand-green mx-1">Terms of Service</Link>
+                           and
+                           <Link href="/privacy" className="text-brand-color font-medium hover:text-brand-green mx-1">Privacy Policy</Link>
+                        </label>
+                     </div>
+
+
 
                      {/* Divider */}
                      <div className="relative">
@@ -119,24 +164,24 @@ const Login = () => {
                               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                            />
                         </svg>
-                        Sign In with Google
+                        Sign Up with Google
                      </button>
 
                      {/* Sign Up Link */}
                      <div className="text-center text-sm text-gray-600">
-                        Don't have an account?{' '}
-                        <Link href="/signup" className="text-brand-green font-bold hover:text-brand-green">
-                           Sign Up
+                        Already have an account?{' '}
+                        <Link href="/login" className="text-brand-green font-bold hover:text-brand-green">
+                           Sign In
                         </Link>
                      </div>
                   </form>
                </div>
             </div>
 
-            
+
          </div>
       </div>
    );
 };
 
-export default Login;
+export default Signup;
