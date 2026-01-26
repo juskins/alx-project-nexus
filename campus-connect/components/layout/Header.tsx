@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CirclePlus, GraduationCap, LogIn } from 'lucide-react';
+import { CirclePlus, LogIn } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
