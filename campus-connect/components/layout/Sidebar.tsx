@@ -1,50 +1,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import {
-   LayoutDashboard,
-   Search,
-   PlusSquare,
-   User,
-   MessageSquare,
-   LogOut
-} from 'lucide-react';
 import Image from 'next/image';
+import { menuItems } from '@/constant';
+import { Button } from '../ui/button';
+import { LogOut } from 'lucide-react';
 
-const Sidebar = () => {
+interface SidebarProps {
+   handleLogout: () => void;
+}
+const Sidebar:React.FC<SidebarProps> = ({handleLogout}) => {
    const router = useRouter();
-
-   const menuItems = [
-      {
-         icon: LayoutDashboard,
-         label: 'Dashboard',
-         href: '/dashboard',
-      },
-      {
-         icon: Search,
-         label: 'Find Jobs',
-         href: '/find-jobs',
-      },
-      {
-         icon: PlusSquare,
-         label: 'Post a Job',
-         href: '/post-job',
-      },
-      {
-         icon: User,
-         label: 'My Profile',
-         href: '/profile',
-      },
-      {
-         icon: MessageSquare,
-         label: 'Messages',
-         href: '/messages',
-      },
-      {
-         icon: LogOut,
-         label: 'Logout',
-         href: '/login',
-      },
-   ];
 
    return (
       <aside className="w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-0 flex flex-col">
@@ -80,6 +45,11 @@ const Sidebar = () => {
                      </li>
                   );
                })}
+               
+               <button onClick={handleLogout} className='flex w-full cursor-pointer hover:bg-red-50 bg-red-50 hover:text-red-800 text-red-600 items-center gap-3 px-4 py-3 rounded-lg transition-colors'>
+                  <LogOut className='w-5 h-5'/>
+                  <div className='' >Logout</div>
+               </button>
             </ul>
          </nav>
       </aside>
