@@ -7,11 +7,13 @@ import WhyStudentsLove from '@/components/common/WhyStudentsLove';
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
+      <Header />
       <main>
         <Hero />
         <HowItWorks />
         <WhyStudentsLove />
       </main>
+      <Footer />
     </div>
   );
 }
