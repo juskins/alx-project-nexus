@@ -10,7 +10,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 const FindJobs = () => {
   const jobs = [
     {
-      image: '/event-coordinator.jpg',
+      image: '/assets/images/event_cordinators.jpg',
       category: 'Student Life Office',
       department: 'Student Life Office',
       location: 'Student Union',
@@ -19,7 +19,8 @@ const FindJobs = () => {
       type: 'Event Planning',
       postedTime: '2 hours ago',
     },
-    {
+     {
+       image: '/assets/images/library.jpg',
       category: 'University Library',
       department: 'University Library',
       location: 'Main Campus Library',
@@ -30,6 +31,7 @@ const FindJobs = () => {
       icon: <BookOpen className="w-8 h-8 text-white" />,
     },
     {
+      image: '/assets/images/research.jpg',
       category: 'Biology Department',
       department: 'Biology Department',
       location: 'Science Building Lab',
@@ -39,7 +41,8 @@ const FindJobs = () => {
       postedTime: '1 day ago',
       icon: <FlaskConical className="w-8 h-8 text-white" />,
     },
-    {
+     {
+        image: '/assets/images/call-center.jpg',
       category: 'Campus IT Services',
       department: 'Campus IT Services',
       location: 'Tech Support Center',
@@ -49,7 +52,8 @@ const FindJobs = () => {
       postedTime: '1 day ago',
       icon: <Monitor className="w-8 h-8 text-white" />,
     },
-    {
+     {
+       image: '/assets/images/fitness.jpg',
       category: 'Campus Recreation',
       department: 'Campus Recreation',
       location: 'Campus Gym',
@@ -60,6 +64,7 @@ const FindJobs = () => {
       icon: <Users className="w-8 h-8 text-white" />,
     },
     {
+      image: '/assets/images/cafeteria.jpg',
       category: 'Dining Services',
       department: 'Dining Services',
       location: 'Student Cafeteria',
@@ -69,7 +74,8 @@ const FindJobs = () => {
       postedTime: '3 days ago',
       icon: <Utensils className="w-8 h-8 text-white" />,
     },
-    {
+     {
+      image: '/assets/images/socialMedia_intern.jpg',
       category: 'University Communications',
       department: 'University Communications',
       location: 'Remote/Hybrid',
@@ -80,12 +86,13 @@ const FindJobs = () => {
       icon: <Megaphone className="w-8 h-8 text-white" />,
     },
     {
-      category: 'Residential Life',
-      department: 'Residential Life',
+      image: '/assets/images/model.jpg',
+      category: 'Photography',
+      department: 'Photography Club',
       location: 'Campus Dorms',
-      title: 'Dormitory Resident Assistant',
+      title: 'Model for Campus Photo Shoot',
       pay: '$1,000/month (Stipend)',
-      type: 'Community Support',
+      type: 'Freelance',
       postedTime: '5 days ago',
       icon: <Home className="w-8 h-8 text-white" />,
     },
@@ -109,7 +116,7 @@ const FindJobs = () => {
               {jobs.map((job, index) => (
                  <JobCard
                     key={index}
-                    image={index === 0 ? job.image : undefined}
+                    image={job.image}
                     category={job.category}
                     department={job.department}
                     location={job.location}
