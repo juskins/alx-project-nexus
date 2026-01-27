@@ -6,6 +6,8 @@ import {
    MessageSquare,
    LogOut
 } from 'lucide-react';
+import { BookOpen, Briefcase, FlaskConical, Monitor, Users, Utensils, Megaphone, Home } from 'lucide-react';
+
 
 export const menuItems = [
       {
@@ -34,3 +36,93 @@ export const menuItems = [
          href: '/messages',
       },
    ];
+
+  export const jobs = [
+    {
+      image: '/assets/images/event_cordinators.jpg',
+      category: 'Student Life Office',
+      department: 'Student Life Office',
+      location: 'Student Union',
+      title: 'Campus Event Coordinators',
+      pay: '$15/hour',
+      type: 'Event Planning',
+      postedTime: '2 hours ago',
+    },
+     {
+       image: '/assets/images/library.jpg',
+      category: 'University Library',
+      department: 'University Library',
+      location: 'Main Campus Library',
+      title: 'Library Cataloging Aid',
+      pay: '$12.50/hour',
+      type: 'Administrative',
+      postedTime: '5 hours ago',
+      icon: BookOpen,
+    },
+    {
+      image: '/assets/images/research.jpg',
+      category: 'Biology Department',
+      department: 'Biology Department',
+      location: 'Science Building Lab',
+      title: 'Research Assistant Dept.',
+      pay: '$18/hour',
+      type: 'Research',
+      postedTime: '1 day ago',
+      icon: FlaskConical,
+    },
+     {
+        image: '/assets/images/call-center.jpg',
+      category: 'Campus IT Services',
+      department: 'Campus IT Services',
+      location: 'Tech Support Center',
+      title: 'IT Help Desk Support',
+      pay: '$16/hour',
+      type: 'Technology',
+      postedTime: '1 day ago',
+      icon: Monitor,
+    },
+     {
+       image: '/assets/images/fitness.jpg',
+      category: 'Campus Recreation',
+      department: 'Campus Recreation',
+      location: 'Campus Gym',
+      title: 'Fitness Center Front Desk',
+      pay: '$14/hour',
+      type: 'Customer Service',
+      postedTime: '2 days ago',
+      icon: Users,
+    },
+    {
+      image: '/assets/images/cafeteria.jpg',
+      category: 'Dining Services',
+      department: 'Dining Services',
+      location: 'Student Cafeteria',
+      title: 'Cafeteria Kitchen Assistant',
+      pay: '$13/hour',
+      type: 'Food Service',
+      postedTime: '3 days ago',
+      icon: Utensils,
+    },
+     {
+      image: '/assets/images/socialMedia_intern.jpg',
+      category: 'University Communications',
+      department: 'University Communications',
+      location: 'Remote/Hybrid',
+      title: 'Social Media Intern',
+      pay: '$17/hour',
+      type: 'Marketing',
+      postedTime: '4 days ago',
+      icon: Megaphone,
+    },
+    {
+      image: '/assets/images/model.jpg',
+      category: 'Photography',
+      department: 'Photography Club',
+      location: 'Campus Dorms',
+      title: 'Model for Campus Photo Shoot',
+      pay: '$1,000/month (Stipend)',
+      type: 'Freelance',
+      postedTime: '5 days ago',
+      icon: Home,
+    },
+  ];

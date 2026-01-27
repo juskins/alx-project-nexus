@@ -27,7 +27,7 @@ const JobCard = ({
    return (
       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200">
          {/* Image Header with Gradient Overlay */}
-         <div className="relative h-40 bg-gradient-to-br from-orange-400 to-orange-600 overflow-hidden">
+         <div className="relative h-40 bg-black/70 overflow-hidden">
             {image ? (
                <Image
                   src={image}
@@ -56,13 +56,7 @@ const JobCard = ({
          <div className="p-5">
             {/* Department and Location */}
             <div className="flex items-start gap-2 mb-3">
-               <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  {icon || <Tag className="w-4 h-4 text-gray-600" />}
-               </div>
                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-900 truncate">
-                     {department}
-                  </h3>
                   <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                      <MapPin className="w-3 h-3" />
                      {location}
