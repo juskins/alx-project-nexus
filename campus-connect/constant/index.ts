@@ -1,3 +1,4 @@
+import { Conversation, Message } from '@/interfaces';
 import {
    LayoutDashboard,
    Search,
@@ -149,4 +150,177 @@ export const menuItems = [
       duration: 'ongoing',
       time: 'morning',
     },
-  ];
+];
+
+export // Mock conversations data
+   const conversations: Conversation[] = [
+      {
+         id: 1,
+         name: 'University Bookstore',
+         avatar: '/assets/images/bookstore-avatar.jpg',
+         lastMessage: 'Got it! The textbooks are ready for pickup.',
+         time: '2:30 PM',
+      },
+      {
+         id: 2,
+         name: 'Student Activities Office',
+         avatar: '/assets/images/student-affairs-avatar.jpg',
+         lastMessage: 'Thanks for organizing the event!',
+         time: 'Yesterday',
+      },
+      {
+         id: 3,
+         name: 'Professor Johnson',
+         avatar: '/assets/images/professor-johnson-avatar.jpg',
+         lastMessage: 'I have a question about the assignment.',
+         time: 'Mon',
+      },
+      {
+         id: 4,
+         name: 'Campus IT Support',
+         avatar: '/assets/images/professor.jpg',
+         lastMessage: 'Your network issue has been resolved.',
+         time: 'Last Week',
+      },
+      {
+         id: 5,
+         name: 'Dining Services',
+         avatar: '/assets/images/ava-profile.jpg',
+         lastMessage: 'Is the dining hall open on holidays?',
+         time: '2 weeks ago',
+      },
+   ];
+  
+
+export // Mock messages for the selected conversation
+   const getMessagesForConversation = (conversationId: number): Message[] => {
+      if (conversationId === 1) {
+         return [
+            {
+               id: 1,
+               text: 'Hi, I saw your post for the part-time assistant position at the Bookstore. Is it still available?',
+               time: '2:20 PM',
+               sender: 'user',
+            },
+            {
+               id: 2,
+               text: 'Yes, it is! We are looking for someone to start next week. Are you available for a quick chat tomorrow?',
+               time: '2:05 PM',
+               sender: 'other',
+            },
+            {
+               id: 3,
+               text: 'Absolutely! What time works best for you?',
+               time: '2:10 PM',
+               sender: 'user',
+            },
+            {
+               id: 4,
+               text: 'How about 10 AM? We can meet at the main counter.',
+               time: '2:15 PM',
+               sender: 'other',
+            },
+            {
+               id: 5,
+               text: 'Sounds good! See you then.',
+               time: '2:20 PM',
+               sender: 'user',
+            },
+            {
+               id: 6,
+               text: 'Great. Got it! The textbooks are ready for pickup.',
+               time: '2:30 PM',
+               sender: 'other',
+            },
+            {
+               id: 7,
+               text: 'Hello, I wanted to follow up on the status of my application for the data entry role. Is there any update?',
+               time: '1:08 PM',
+               sender: 'user',
+            },
+            {
+               id: 8,
+               text: 'Thank you for your patience. We are still reviewing applications and will reach out by the end of the week.',
+               time: '3:05 PM',
+               sender: 'other',
+            },
+            {
+               id: 9,
+               text: 'Understood. Is there anything else you need from me?',
+               time: '3:10 PM',
+               sender: 'user',
+            },
+            {
+               id: 10,
+               text: 'Not at this moment, but we appreciate your interest. We will be in touch soon.',
+               time: '3:15 PM',
+               sender: 'other',
+            },
+         ];
+      }
+      else if (conversationId === 2) {
+         return [
+            {
+               id: 1,
+               text: 'Hi, I saw your post for the event',
+               time: '2:20 PM',
+               sender: 'user',
+            },
+            {
+               id: 2,
+               text: 'Yes, it is! We are looking for someone to start next week. Are you available for a quick chat tomorrow?',
+               time: '2:05 PM',
+               sender: 'other',
+            },
+            {
+               id: 3,
+               text: 'Absolutely! What time works best for you?',
+               time: '2:10 PM',
+               sender: 'user',
+            },
+            {
+               id: 4,
+               text: 'How about 10 AM? We can meet at the main counter.',
+               time: '2:15 PM',
+               sender: 'other',
+            },
+            {
+               id: 5,
+               text: 'Sounds good! See you then.',
+               time: '2:20 PM',
+               sender: 'user',
+            },
+            {
+               id: 6,
+               text: 'Great. Got it! The textbooks are ready for pickup.',
+               time: '2:30 PM',
+               sender: 'other',
+            },
+            {
+               id: 7,
+               text: 'Hello, I wanted to follow up on the status of my application for the data entry role. Is there any update?',
+               time: '1:08 PM',
+               sender: 'user',
+            },
+            {
+               id: 8,
+               text: 'Thank you for your patience. We are still reviewing applications and will reach out by the end of the week.',
+               time: '3:05 PM',
+               sender: 'other',
+            },
+            {
+               id: 9,
+               text: 'Understood. Is there anything else you need from me?',
+               time: '3:10 PM',
+               sender: 'user',
+            },
+            {
+               id: 10,
+               text: 'Not at this moment, but we appreciate your interest. We will be in touch soon.',
+               time: '3:15 PM',
+               sender: 'other',
+            },
+         ];
+      }
+      return [];
+   };

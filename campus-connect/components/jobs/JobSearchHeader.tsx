@@ -5,7 +5,7 @@ const JobSearchHeader = () => {
   const { search, setSearch } = useFilter();
   return (
     <div className="mb-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-3">
+      <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
         Find Your Next Campus Job
       </h1>
       <p className="text-gray-600 mb-6">

@@ -29,7 +29,7 @@ const FilterBar = () => {
 
 
    return (
-      <div className="flex flex-wrap items-center gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 items-center gap-3 mb-8">
          {/* Category Dropdown */}
          <Select
             value={category}

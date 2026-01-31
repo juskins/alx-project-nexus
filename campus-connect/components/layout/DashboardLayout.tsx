@@ -7,16 +7,27 @@ import { useState } from "react";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
    const [isLoggingOut, setIsLoggingOut] = useState(false);
-      const router = useRouter();
-      const handleLogout = () => {
-         setIsLoggingOut(true);
-         setTimeout(() => {
-            router.push('/login');
-         }, 3000);
-      };
+   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+   const router = useRouter();
+
+   const handleLogout = () => {
+      setIsLoggingOut(true);
+      setTimeout(() => {
+         router.push('/login');
+      }, 3000);
+   };
+
+   const toggleSidebar = () => {
+      setIsSidebarOpen(!isSidebarOpen);
+   };
+
+   const closeSidebar = () => {
+      setIsSidebarOpen(false);
+   };
+
    return (
       <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-         {/* Logout loading overlay */} 
+         {/* Logout loading overlay */}
          {isLoggingOut && (
             <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center">
                <div className="text-center space-y-4">
@@ -29,14 +40,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
          )}
 
-         <Sidebar handleLogout={handleLogout} />
-         <DashboardHeader />
+         <Sidebar
+            handleLogout={handleLogout}
+            isOpen={isSidebarOpen}
+            onClose={closeSidebar}
+         />
+         <DashboardHeader onMenuClick={toggleSidebar} />
 
-         <main className="ml-64 pt-20 pb-8">
+         <main className="lg:ml-64 pt-20 pb-8">
             {children}
          </main>
 
-         <div className="ml-64">
+         <div className="lg:ml-64">
             <Footer />
          </div>
       </div>

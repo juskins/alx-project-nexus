@@ -45,7 +45,7 @@ const PostJob = () => {
          <div className="max-w-7xl mx-auto px-8 overflow-hidden">
             {/* Page Header */}
             <div className="mb-8">
-               <h1 className="text-3xl font-bold text-gray-900 mb-2">Post a New Job</h1>
+               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Post a New Job</h1>
                <p className="text-gray-600">
                   Fill out the details below to list a new opportunity for students on CampusConnect.
                </p>

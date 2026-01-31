@@ -40,7 +40,7 @@ const JobDetails = () => {
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
                   <div className="lg:col-span-2 p-8 lg:p-12 border-1 border-gray-200 ">
                      {/* Job Title */}
-                     <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                     <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                         {job.title}
                      </h1>
 
