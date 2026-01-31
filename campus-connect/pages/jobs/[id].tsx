@@ -44,6 +44,17 @@ const JobDetails = () => {
                         {job.title}
                      </h1>
 
+                     {/* Job Image */}
+                     <div className="mb-8">
+                        <Image
+                           src={job.image}
+                           alt={job.title}
+                           width={500}
+                           height={300}
+                           className="w-full h-auto object-cover rounded-lg"
+                        />
+                     </div>
+
                      {/* Job Description */}
                      <div className="mb-8">
                         <p className="text-gray-700 leading-relaxed mb-4">
