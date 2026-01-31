@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+*.md
+!README.md
+
 # production
 /build
 
