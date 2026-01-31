@@ -15,8 +15,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
          }, 3000);
       };
    return (
-      <div className="min-h-screen bg-gray-50">
-         {/* Logout loading overlay */}
+      <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+         {/* Logout loading overlay */} 
          {isLoggingOut && (
             <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center">
                <div className="text-center space-y-4">

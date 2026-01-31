@@ -11,6 +11,7 @@ interface JobCardProps {
    type: string;
    postedTime: string;
    icon?: React.ReactNode;
+   address: string;
 }
 
 const JobCard = ({
@@ -23,6 +24,7 @@ const JobCard = ({
    type,
    postedTime,
    icon,
+   address,
 }: JobCardProps) => {
    return (
       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200">
@@ -59,7 +61,7 @@ const JobCard = ({
                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                      <MapPin className="w-3 h-3" />
-                     {location}
+                     {address}
                   </p>
                </div>
             </div>

@@ -14,6 +14,8 @@ interface FilterContextType {
   setLocation: (value: string) => void;
   clearAll: () => void;
   filteredJobs: typeof jobs;
+  search: string;
+  setSearch: (value: string) => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -24,6 +26,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [duration, setDuration] = useState('');
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
+  const [search, setSearch] = useState('');
 
   const clearAll = () => {
     setCategory('');
@@ -31,6 +34,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     setDuration('');
     setTime('');
     setLocation('');
+    setSearch('');
   };
 
   // Filter jobs based on selected criteria
@@ -50,11 +54,29 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         if (pay === '25+' && jobPayValue < 25) return false;
       }
 
-      
+      // Filter by duration
+      if (duration && job.duration !== duration) {
+        return false;
+      }
+
+      // Filter by time
+      if (time && job.time !== time) {
+        return false;
+      }
+
+      // Filter by location
+      if (location && job.location !== location) {
+        return false;
+      }
+
+      // Filter by search
+      if (search && !job.title.toLowerCase().includes(search.toLowerCase()) && !job?.department.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
 
       return true;
     });
-  }, [category, pay, duration, time, location]);
+  }, [category, pay, duration, time, location, search]);
 
   return (
     <FilterContext.Provider
@@ -69,6 +91,8 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         setTime,
         location,
         setLocation,
+        search,
+        setSearch,
         clearAll,
         filteredJobs,
       }}

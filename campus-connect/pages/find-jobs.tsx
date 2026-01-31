@@ -6,64 +6,65 @@ import { FilterProvider, useFilter } from '@/context/FilterContext';
 
 const FindJobsContent = () => {
    const { filteredJobs, clearAll } = useFilter();
-  
 
-  return (
-     <DashboardLayout>
-        <div className="max-w-7xl mx-auto px-8">
-           <JobSearchHeader />
-           <FilterBar />
 
-           {/* Job Listings */}
-           <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                 Recent Job Openings{' '}
-                 <span className="text-gray-500 font-normal">({filteredJobs.length})</span>
-              </h2>
-           </div>
+   return (
+      <DashboardLayout>
+         <div className="max-w-7xl mx-auto px-8 overflow-hidden">
+            <JobSearchHeader />
+            <FilterBar />
 
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {filteredJobs.length > 0 ? (
-                 filteredJobs.map((job, index) => {
-                 const IconComponent = job.icon;
-                 return (
-                    <JobCard
-                       key={index}
-                       image={job.image}
-                       category={job.category}
-                       department={job.department}
-                       location={job.location}
-                       title={job.title}
-                       pay={job.pay}
-                       type={job.type}
-                       postedTime={job.postedTime}
-                       icon={IconComponent ? <IconComponent /> : undefined}
-                    />
-                 );
-              })
-              ) : (
-                 <div className="col-span-full text-center py-12">
-                    <p className="text-gray-500 text-lg">No jobs found matching your filters.</p>
-                    <button
-                       onClick={clearAll}
-                       className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
-                    >
-                       Clear Filters
-                    </button>
-                 </div>
-              )}
-           </div>
-        </div>
-       </DashboardLayout>
-  );
+            {/* Job Listings */}
+            <div className="mb-6">
+               <h2 className="text-2xl font-bold text-gray-900">
+                  Recent Job Openings{' '}
+                  <span className="text-gray-500 font-normal">({filteredJobs.length})</span>
+               </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+               {filteredJobs.length > 0 ? (
+                  filteredJobs.map((job, index) => {
+                     const IconComponent = job.icon;
+                     return (
+                        <JobCard
+                           key={index}
+                           image={job.image}
+                           category={job.category}
+                           department={job.department}
+                           location={job.location}
+                           title={job.title}
+                           pay={job.pay}
+                           address={job.address}
+                           type={job.type}
+                           postedTime={job.postedTime}
+                           icon={IconComponent ? <IconComponent /> : undefined}
+                        />
+                     );
+                  })
+               ) : (
+                  <div className="col-span-full text-center py-12">
+                     <p className="text-gray-500 text-lg">No jobs found matching your filters.</p>
+                     <button
+                        onClick={clearAll}
+                        className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+                     >
+                        Clear Filters
+                     </button>
+                  </div>
+               )}
+            </div>
+         </div>
+      </DashboardLayout>
+   );
 };
 
 const FindJobs = () => {
-  return (
-    <FilterProvider>
-      <FindJobsContent />
-    </FilterProvider>
-  );
+   return (
+      <FilterProvider>
+         <FindJobsContent />
+      </FilterProvider>
+   );
 };
 
 export default FindJobs;

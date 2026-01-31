@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const DashboardHeader = () => {
    return (
-      <header className="bg-white border-b border-gray-200 px-8 py-3 fixed top-0 right-0 left-64 z-10">
+      <header className="bg-white border-b border-gray-200 px-8 py-3 fixed top-0 right-0 left-64 z-10 overflow-hidden">
          <div className="flex items-center justify-end gap-4">
             {/* Notification Bell */}
             <button className="p-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors">

@@ -85,11 +85,11 @@ const FilterBar = () => {
             <SelectContent>
                <SelectGroup>
                   <SelectLabel>Select Duration</SelectLabel>
-                  <SelectItem value="any">Any Duration</SelectItem>
-                  <SelectItem value="1-2">1-2 hours</SelectItem>
-                  <SelectItem value="2-4">2-4 hours</SelectItem>
-                  <SelectItem value="4-8">4-8 hours</SelectItem>
-                  <SelectItem value="full-day">Full Day</SelectItem>
+                  <SelectItem value="any time">Any Duration</SelectItem>
+                  <SelectItem value="1-2 hours">1-2 hours</SelectItem>
+                  <SelectItem value="2-4 hours">2-4 hours</SelectItem>
+                  <SelectItem value="4-8 hours">4-8 hours</SelectItem>
+                  <SelectItem value="full day">Full Day</SelectItem>
                   <SelectItem value="ongoing">Ongoing</SelectItem>
                </SelectGroup>
             </SelectContent>
@@ -106,7 +106,7 @@ const FilterBar = () => {
             <SelectContent className=''>
                <SelectGroup>
                   <SelectLabel>Select Time</SelectLabel>
-                  <SelectItem value="any">Any Time</SelectItem>
+                  <SelectItem value="any time">Any Time</SelectItem>
                   <SelectItem value="morning">Morning</SelectItem>
                   <SelectItem value="afternoon">Afternoon</SelectItem>
                   <SelectItem value="evening">Evening</SelectItem>
@@ -116,7 +116,7 @@ const FilterBar = () => {
             </SelectContent>
          </Select>
 
-         {/* Location Dropdown */}  
+         {/* Location Dropdown */}
          <Select
             value={location}
             onValueChange={(value) => setLocation(value)}>
