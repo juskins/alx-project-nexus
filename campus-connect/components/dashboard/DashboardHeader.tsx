@@ -1,13 +1,16 @@
 import { Bell, CirclePlus, User } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const DashboardHeader = () => {
+   const router = useRouter();
    return (
       <header className="bg-white border-b border-gray-200 px-8 py-3 fixed top-0 right-0 left-64 z-10 overflow-hidden">
          <div className="flex items-center justify-end gap-4">
             {/* Notification Bell */}
-            <button className="p-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors">
+            <button onClick={() => router.push('/post-job')} className="p-2 flex items-center gap-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors">
                <CirclePlus className="w-5 h-5 text-white" />
+               <span className="text-white">Post a Job</span>
             </button>
 
             {/* User Icon */}

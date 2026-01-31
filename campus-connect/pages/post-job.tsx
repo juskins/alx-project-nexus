@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Edit3, DollarSign, FileText, Upload, Eye, Calendar } from 'lucide-react';
+import { Edit3, DollarSign, FileText, Upload, Eye } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const PostJob = () => {
