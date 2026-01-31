@@ -1,5 +1,20 @@
 import { createContext, useContext, useState, useMemo, ReactNode } from 'react';
-import { jobs } from '@/constant';
+import { jobs as initialJobs } from '@/constant';
+
+interface Job {
+  image: string;
+  category: string;
+  department: string;
+  address: string;
+  location: string;
+  title: string;
+  pay: string;
+  type: string;
+  postedTime: string;
+  duration: string;
+  time: string;
+  icon?: any;
+}
 
 interface FilterContextType {
   category: string;
@@ -13,9 +28,11 @@ interface FilterContextType {
   location: string;
   setLocation: (value: string) => void;
   clearAll: () => void;
-  filteredJobs: typeof jobs;
+  filteredJobs: Job[];
   search: string;
   setSearch: (value: string) => void;
+  addJob: (job: Job) => void;
+  allJobs: Job[];
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -27,6 +44,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
   const [search, setSearch] = useState('');
+  const [allJobs, setAllJobs] = useState<Job[]>(initialJobs);
 
   const clearAll = () => {
     setCategory('');
@@ -37,9 +55,13 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     setSearch('');
   };
 
+  const addJob = (job: Job) => {
+    setAllJobs(prevJobs => [job, ...prevJobs]);
+  };
+
   // Filter jobs based on selected criteria
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    return allJobs.filter((job) => {
       // Filter by category (job type)
       if (category && job.type !== category) {
         return false;
@@ -76,7 +98,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
 
       return true;
     });
-  }, [category, pay, duration, time, location, search]);
+  }, [category, pay, duration, time, location, search, allJobs]);
 
   return (
     <FilterContext.Provider
@@ -95,6 +117,8 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         setSearch,
         clearAll,
         filteredJobs,
+        addJob,
+        allJobs,
       }}
     >
       {children}
