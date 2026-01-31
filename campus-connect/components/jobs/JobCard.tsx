@@ -1,5 +1,6 @@
 import { MapPin, Tag, Clock, DollarSign } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 interface JobCardProps {
    image?: string;
@@ -12,6 +13,7 @@ interface JobCardProps {
    postedTime: string;
    icon?: React.ReactNode;
    address: string;
+   jobIndex: number;
 }
 
 const JobCard = ({
@@ -25,9 +27,19 @@ const JobCard = ({
    postedTime,
    icon,
    address,
+   jobIndex,
 }: JobCardProps) => {
+   const router = useRouter();
+
+   const handleClick = () => {
+      router.push(`/jobs/${jobIndex}`);
+   };
+
    return (
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200">
+      <div
+         onClick={handleClick}
+         className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+      >
          {/* Image Header with Gradient Overlay */}
          <div className="relative h-40 bg-black/70 overflow-hidden">
             {image ? (

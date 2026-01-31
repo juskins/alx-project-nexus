@@ -29,6 +29,7 @@ const FindJobsContent = () => {
                      return (
                         <JobCard
                            key={index}
+                           jobIndex={index}
                            image={job.image}
                            category={job.category}
                            department={job.department}
