@@ -1,18 +1,36 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 
 const Login = () => {
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const [showPassword, setShowPassword] = useState(false);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState<null | string>(null);
    const router = useRouter();
+
+   const loginUser = async () => {
+      try {
+         setLoading(true);
+         const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+         const { token } = response.data;
+         console.log(response.data);
+         localStorage.setItem('token', token);
+         // router.push('/dashboard');
+      } catch (error) {
+         console.error('Login failed:', error);
+         setError(error as string);
+      } finally {
+         setLoading(false);
+      }
+   };
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      router.push('/dashboard');
-
+      loginUser();
    };
 
    return (
@@ -25,7 +43,7 @@ const Login = () => {
                {/* Background image slideshow */}
                <div className="absolute inset-0 w-full h-full">
                   {/* Campus illustration placeholder */}
-                  <div className="w-full h-full bg-cover bg-bottom" style={{backgroundImage: "url('/assets/images/loginBg.png')"}}>
+                  <div className="w-full h-full bg-cover bg-bottom" style={{ backgroundImage: "url('/assets/images/loginBg.png')" }}>
                   </div>
                </div>
             </div>
@@ -98,7 +116,7 @@ const Login = () => {
                         Login
                      </button>
 
-                     
+
 
                      {/* Divider */}
                      <div className="relative">
@@ -147,7 +165,7 @@ const Login = () => {
                </div>
             </div>
 
-            
+
          </div>
       </div>
    );
