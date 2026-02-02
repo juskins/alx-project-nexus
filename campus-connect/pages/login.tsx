@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 
 const Login = () => {
@@ -19,14 +20,19 @@ const Login = () => {
          const { token } = response.data;
          console.log(response.data);
          localStorage.setItem('token', token);
-         // router.push('/dashboard');
-      } catch (error) {
+         router.push('/dashboard');
+      } catch (error: any) {
          console.error('Login failed:', error);
-         setError(error as string);
+         setError(error.response.data.message);
       } finally {
          setLoading(false);
       }
    };
+
+   if (error) {
+      toast.error(error, { position: "top-right" });
+      console.log(error);
+   }
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -113,7 +119,7 @@ const Login = () => {
                         type="submit"
                         className="w-full bg-brand-color cursor-pointer hover:bg-brand-green text-white font-semibold py-3 rounded-lg transition-colors"
                      >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                      </button>
 
 
