@@ -1,9 +1,14 @@
-import express, { Application } from 'express';
 import dotenv from 'dotenv';
+
+// Load env vars FIRST before any other imports that use them
+dotenv.config();
+
+import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/database';
+import './config/cloudinary'; // Initialize Cloudinary (after dotenv)
 import { errorHandler } from './middleware/errorHandler';
 
 // Import routes
@@ -11,9 +16,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import jobRoutes from './routes/jobRoutes';
 import messageRoutes from './routes/messageRoutes';
-
-// Load env vars
-dotenv.config();
+import uploadRoutes from './routes/uploadRoutes';
 
 // Connect to database
 connectDB();
@@ -45,6 +48,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

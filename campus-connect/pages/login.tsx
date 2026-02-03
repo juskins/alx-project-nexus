@@ -17,13 +17,19 @@ const Login = () => {
       try {
          setLoading(true);
          const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-         const { token } = response.data.data;
-         console.log(response.data);
+         const { token, ...userData } = response.data.data;
+
+         // Store token
          localStorage.setItem('token', token);
+
+         // Store user data (including role for authorization)
+         localStorage.setItem('user', JSON.stringify(userData));
+
+         toast.success('Login successful!', { position: 'top-right' });
          router.push('/dashboard');
       } catch (error: any) {
          console.error('Login failed:', error);
-         setError(error.response.data.message);
+         setError(error.response?.data?.message || 'Login failed');
       } finally {
          setLoading(false);
       }
@@ -31,8 +37,8 @@ const Login = () => {
 
    if (error) {
       toast.error(error, { position: "top-right" });
-      console.log(error);
    }
+
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();

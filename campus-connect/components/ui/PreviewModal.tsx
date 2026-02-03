@@ -13,9 +13,10 @@ interface PreviewModalProps {
       location: string;
       duration: string;
    };
+   image?: string;
 }
 
-const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, jobData }) => {
+const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, jobData, image }) => {
    useEffect(() => {
       if (isOpen) {
          document.body.style.overflow = 'hidden';
@@ -59,6 +60,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, jobData })
                   {/* Image Placeholder */}
                   <div className="h-48 bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
                      <span className="text-white text-lg font-semibold">Job Image</span>
+
                   </div>
 
                   {/* Job Details */}
