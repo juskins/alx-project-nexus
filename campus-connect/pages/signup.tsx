@@ -5,6 +5,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
+import api from '@/utils/api';
 
 const Signup = () => {
    const [role, setRole] = useState('student');
@@ -20,7 +21,7 @@ const Signup = () => {
    const signupUser = async () => {
       try {
          setIsSigningUp(true);
-         const response = await axios.post('http://localhost:5000/api/auth/register/', { role, email, password, name: username });
+         const response = await api.post('/auth/register/', { role, email, password, name: username });
          console.log(response.data);
          setIsSigningUp(false);
          toast.success('User created successfully, check your email to verify your account', { position: "top-right" });

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import { toast } from 'sonner';
+import api from '@/utils/api';
 
 
 const Login = () => {
@@ -16,7 +16,7 @@ const Login = () => {
    const loginUser = async () => {
       try {
          setLoading(true);
-         const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+         const response = await api.post('/auth/login', { email, password });
          const { token, ...userData } = response.data.data;
 
          // Store token

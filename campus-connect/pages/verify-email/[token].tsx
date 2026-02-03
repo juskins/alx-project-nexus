@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import { CheckCircle, XCircle, Loader2, Mail, ArrowRight } from 'lucide-react';
+import api from '@/utils/api';
 
 type VerificationStatus = 'loading' | 'success' | 'error';
 
@@ -34,8 +35,8 @@ const VerifyEmail = () => {
    const verifyEmailToken = async (verificationToken: string) => {
       try {
          setStatus('loading');
-         const response = await axios.get(
-            `http://localhost:5000/api/auth/verify-email/${verificationToken}`
+         const response = await api.get(
+            `/auth/verify-email/${verificationToken}`
          );
 
          if (response.data.success) {

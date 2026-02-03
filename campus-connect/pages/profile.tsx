@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { getAuthToken } from '@/utils/auth';
 import { toast } from 'sonner';
+import api from '@/utils/api';
 
 interface UserProfile {
    _id: string;
@@ -57,11 +58,7 @@ const Profile = () => {
             return;
          }
 
-         const response = await axios.get('http://localhost:5000/api/users/profile', {
-            headers: {
-               Authorization: `Bearer ${token}`,
-            },
-         });
+         const response = await api.get('/users/profile');
 
          if (response.data.success) {
             setUser(response.data.data);
@@ -86,11 +83,7 @@ const Profile = () => {
          if (!token) return;
 
          // Fetch user's posted jobs
-         const jobsResponse = await axios.get('http://localhost:5000/api/jobs/my-jobs', {
-            headers: {
-               Authorization: `Bearer ${token}`,
-            },
-         });
+         const jobsResponse = await api.get('/jobs/my-jobs');
 
          if (jobsResponse.data.success) {
             setStats(prev => ({

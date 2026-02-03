@@ -1,7 +1,8 @@
-import { Briefcase, FileText, CheckCircle, Loader2 } from 'lucide-react';
+import { Briefcase, CheckCircle, Clock, FileText, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/utils/api';
 import { getAuthToken, getStoredUser } from '@/utils/auth';
+import { useRouter } from 'next/router';
 
 interface DashboardStats {
   activeJobs: number;
@@ -12,37 +13,50 @@ interface DashboardStats {
 }
 
 const Overview = () => {
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const user = getStoredUser();
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role || null);
     fetchDashboardStats();
   }, []);
 
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = getAuthToken();
 
       if (!token) {
         setError('Please login to view dashboard');
+        setLoading(false);
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/jobs/stats', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.get('/jobs/stats');
 
       if (response.data.success) {
         setStats(response.data.data);
       }
     } catch (error: any) {
       console.error('Error fetching dashboard stats:', error);
-      setError(error.response?.data?.message || 'Failed to load stats');
+
+      // Handle 401 errors gracefully
+      if (error.response?.status === 401) {
+        setError('Session expired. Please login again.');
+        // Optionally redirect to login after a delay
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          router.push('/login');
+        }, 2000);
+      } else {
+        setError(error.response?.data?.message || 'Failed to load stats');
+      }
     } finally {
       setLoading(false);
     }
@@ -50,7 +64,7 @@ const Overview = () => {
 
   // Define stats based on user role
   const getStatsConfig = () => {
-    if (user?.role === 'employer' || user?.role === 'admin') {
+    if (userRole === 'employer' || userRole === 'admin') {
       return [
         {
           icon: Briefcase,
@@ -122,12 +136,14 @@ const Overview = () => {
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Overview</h2>
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
           <p className="text-red-600">{error}</p>
-          <button
-            onClick={fetchDashboardStats}
-            className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
-          >
-            Retry
-          </button>
+          {!error.includes('Session expired') && (
+            <button
+              onClick={fetchDashboardStats}
+              className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
+            >
+              Retry
+            </button>
+          )}
         </div>
       </section>
     );
@@ -153,8 +169,8 @@ const Overview = () => {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`w-6 h-6 ${stat.iconColor}`} />
+                <div className={`p - 2 rounded - lg ${stat.bgColor} `}>
+                  <Icon className={`w - 6 h - 6 ${stat.iconColor} `} />
                 </div>
               </div>
             </div>

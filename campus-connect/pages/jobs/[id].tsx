@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'sonner';
+import api from '@/utils/api';
 
 interface Job {
    _id: string;
@@ -46,7 +47,7 @@ const JobDetails = () => {
          setLoading(true);
          setError(null);
 
-         const response = await axios.get(`http://localhost:5000/api/jobs/${id}`);
+         const response = await api.get(`/jobs/${id}`);
 
          if (response.data.success) {
             setJob(response.data.data);

@@ -1,16 +1,9 @@
 import { getStoredUser } from '@/utils/auth';
 import { Search, Megaphone } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 
 const QuickActions = () => {
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const user = getStoredUser();
-    setUserRole(user?.role || null);
-  }, []);
-
+  const user = getStoredUser();
   const actions = [
     {
       icon: Search,
@@ -23,9 +16,8 @@ const QuickActions = () => {
       icon: Megaphone,
       title: 'List a New Job',
       description: 'Quickly create and post a new job for students.',
-      href: (userRole === 'employer' || userRole === 'admin') ? '/post-job' : '/find-jobs',
+      href: (user?.role === 'employer' || user?.role === 'admin') ? '/post-job' : '#',
       iconColor: 'text-brand-color',
-      disabled: userRole === 'student',
     },
   ];
 
@@ -39,8 +31,7 @@ const QuickActions = () => {
             <Link
               key={index}
               href={action.href}
-              className={`bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-shadow ${action.disabled ? 'opacity-50 pointer-events-none' : ''
-                }`}
+              className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4">

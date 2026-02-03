@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from './api';
 
 const API_URL = 'http://localhost:5000/api/auth';
 
@@ -19,14 +20,9 @@ export const logoutUser = async (): Promise<any> => {
 
       if (token) {
          // Call backend logout endpoint
-         await axios.post(
-            `${API_URL}/logout`,
+         await api.post(
+            `/auth/logout`,
             {},
-            {
-               headers: {
-                  Authorization: `Bearer ${token}`,
-               },
-            }
          );
       }
 

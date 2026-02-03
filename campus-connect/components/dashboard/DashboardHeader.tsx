@@ -2,7 +2,6 @@ import { getStoredUser } from '@/utils/auth';
 import { Bell, CirclePlus, User, Menu } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
 
 interface DashboardHeaderProps {
    onMenuClick?: () => void;
@@ -10,12 +9,7 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
    const router = useRouter();
-   const [userRole, setUserRole] = useState<string | null>(null);
-
-   useEffect(() => {
-      const user = getStoredUser();
-      setUserRole(user?.role || null);
-   }, []);
+   const user = getStoredUser();
 
    return (
       <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 fixed top-0 right-0 left-0 lg:left-64 z-10 overflow-hidden">
@@ -32,7 +26,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
             {/* Actions - Right side */}
             <div className="flex items-center justify-end gap-2 md:gap-4 ml-auto">
                {/* Post a Job Button */}
-               {(userRole === 'employer' || userRole === 'admin') && (
+               {(user?.role === 'employer' || user?.role === 'admin') && (
                   <button onClick={() => router.push('/post-job')} className="p-2 flex items-center gap-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors cursor-pointer">
                      <CirclePlus className="w-5 h-5 text-white" />
                      <span className="text-white hidden sm:inline">Post a Job</span>

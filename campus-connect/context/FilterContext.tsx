@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import api from '@/utils/api';
 import { toast } from 'sonner';
 
 interface Job {
@@ -98,7 +98,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      const response = await axios.get('http://localhost:5000/api/jobs', {
+      const response = await api.get('/jobs', {
         params,
       });
 

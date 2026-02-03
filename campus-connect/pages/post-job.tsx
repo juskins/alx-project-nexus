@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { getAuthToken, getStoredUser } from '@/utils/auth';
+import api from '@/utils/api';
 
 const PostJob = () => {
    const router = useRouter();
@@ -83,12 +84,11 @@ const PostJob = () => {
                return;
             }
 
-            const response = await axios.post(
-               'http://localhost:5000/api/upload',
+            const response = await api.post(
+               '/upload',
                formData,
                {
                   headers: {
-                     Authorization: `Bearer ${token}`,
                      'Content-Type': 'multipart/form-data',
                   },
                }
@@ -178,16 +178,31 @@ const PostJob = () => {
          };
 
          // Call backend API
-         const response = await axios.post(
-            'http://localhost:5000/api/jobs',
-            jobData,
-            {
-               headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-               },
-            }
-         );
+         const response = await api.post('/jobs', jobData);
+
+         if (response.data.success) {
+            // Add job to context for immediate UI update
+            const newJob = {
+               image: jobData.image,
+               category: jobData.category,
+               department: jobData.department,
+               address: jobData.address,
+               location: jobData.location,
+               title: jobData.title,
+               payRate: jobData.payRate,
+               type: jobData.type,
+               postedTime: 'Just now',
+               duration: jobData.duration,
+               time: jobData.time,
+               createdAt: response.data.createdAt,
+               _id: response.data._id,
+            };
+            addJob(newJob);
+
+            // Show success modal
+            setShowSuccessModal(true);
+            toast.success('Job posted successfully!');
+         }
 
          if (response.data.success) {
             // Add job to context for immediate UI update

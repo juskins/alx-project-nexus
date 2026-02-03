@@ -3,6 +3,7 @@ import { X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { getAuthToken } from '@/utils/auth';
 import { toast } from 'sonner';
+import api from '@/utils/api';
 
 interface EditProfileModalProps {
    isOpen: boolean;
@@ -87,15 +88,8 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSuccess }: EditProfileM
             return;
          }
 
-         const response = await axios.put(
-            'http://localhost:5000/api/users/profile',
-            formData,
-            {
-               headers: {
-                  Authorization: `Bearer ${token}`,
-               },
-            }
-         );
+         const response = await api.put('/users/profile', formData);
+
 
          if (response.data.success) {
             toast.success('Profile updated successfully!');
