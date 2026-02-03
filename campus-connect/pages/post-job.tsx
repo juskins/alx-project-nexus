@@ -178,11 +178,13 @@ const PostJob = () => {
                address: jobData.address,
                location: jobData.location,
                title: jobData.title,
-               pay: `$${jobData.payRate}/hour`,
+               payRate: jobData.payRate,
                type: jobData.type,
                postedTime: 'Just now',
                duration: jobData.duration,
                time: jobData.time,
+               createdAt: response.data.createdAt,
+               _id: response.data._id,
             };
             addJob(newJob);
 

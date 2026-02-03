@@ -52,7 +52,8 @@ const FindJobsContent = () => {
                         const IconComponent = job.icon;
                         return (
                            <JobCard
-                              key={job._id || index}
+                              key={job._id}
+                              _id={job._id}
                               jobIndex={index}
                               image={job.image}
                               category={job.category}

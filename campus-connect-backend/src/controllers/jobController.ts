@@ -103,7 +103,7 @@ export const getJob = async (req: Request, res: Response): Promise<void> => {
    try {
       const job = await Job.findById(req.params.id).populate(
          'postedBy',
-         'name email avatar department'
+         'name email avatar department role'
       );
 
       if (!job) {
