@@ -1,6 +1,8 @@
+import { getStoredUser } from '@/utils/auth';
 import { Bell, CirclePlus, User, Menu } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 interface DashboardHeaderProps {
    onMenuClick?: () => void;
@@ -8,6 +10,13 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
    const router = useRouter();
+   const [userRole, setUserRole] = useState<string | null>(null);
+
+   useEffect(() => {
+      const user = getStoredUser();
+      setUserRole(user?.role || null);
+   }, []);
+
    return (
       <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 fixed top-0 right-0 left-0 lg:left-64 z-10 overflow-hidden">
          <div className="flex items-center justify-between gap-4">
@@ -23,19 +32,22 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
             {/* Actions - Right side */}
             <div className="flex items-center justify-end gap-2 md:gap-4 ml-auto">
                {/* Post a Job Button */}
-               <button onClick={() => router.push('/post-job')} className="p-2 flex items-center gap-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors cursor-pointer">
-                  <CirclePlus className="w-5 h-5 text-white" />
-                  <span className="text-white hidden sm:inline">Post a Job</span>
-               </button>
+               {(userRole === 'employer' || userRole === 'admin') && (
+                  <button onClick={() => router.push('/post-job')} className="p-2 flex items-center gap-2 bg-brand-color hover:bg-brand-color/80 rounded-lg transition-colors cursor-pointer">
+                     <CirclePlus className="w-5 h-5 text-white" />
+                     <span className="text-white hidden sm:inline">Post a Job</span>
+                  </button>
+               )}
+
 
                {/* My Profile Button */}
-               <button className="p-2 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer">
+               <button onClick={() => router.push('/profile')} className="p-2 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer">
                   <User className="w-5 h-5 text-gray-700" />
                   <span className="text-gray-700 hidden sm:inline">My Profile</span>
                </button>
 
                {/* User Avatar */}
-               <button className="w-10 h-10 bg-gray-300 rounded-full overflow-hidden hover:ring-2 hover:ring-orange-500 transition-all cursor-pointer">
+               <button onClick={() => router.push('/profile')} className="w-10 h-10 bg-gray-300 rounded-full overflow-hidden hover:ring-2 hover:ring-orange-500 transition-all cursor-pointer">
                   <Image
                      src="/assets/images/profile.jpg"
                      alt="User"

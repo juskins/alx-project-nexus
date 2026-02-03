@@ -17,6 +17,26 @@ const PostJob = () => {
    const [showPreviewModal, setShowPreviewModal] = useState(false);
    const [isSubmitting, setIsSubmitting] = useState(false);
    const [isUploadingImage, setIsUploadingImage] = useState(false);
+   const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+
+   // Check user role on mount
+   useEffect(() => {
+      const user = getStoredUser();
+
+      if (!user) {
+         router.push('/login');
+         return;
+      }
+
+      // Only employers and admins can post jobs
+      if (user.role === 'student') {
+         toast.error('Students cannot post jobs');
+         router.push('/find-jobs');
+         return;
+      }
+
+      setIsCheckingAccess(false);
+   }, [router]);
 
    const [formData, setFormData] = useState({
       jobTitle: '',
@@ -221,6 +241,19 @@ const PostJob = () => {
    const handlePreview = () => {
       setShowPreviewModal(true);
    };
+
+   // Show loading while checking access
+   if (isCheckingAccess) {
+      return (
+         <DashboardLayout>
+            <div className="max-w-7xl mx-auto px-8 py-12">
+               <div className="flex items-center justify-center py-20">
+                  <div className="text-gray-600">Checking access...</div>
+               </div>
+            </div>
+         </DashboardLayout>
+      );
+   }
 
    return (
       <DashboardLayout>
