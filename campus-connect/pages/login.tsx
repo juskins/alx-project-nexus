@@ -17,7 +17,7 @@ const Login = () => {
       try {
          setLoading(true);
          const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-         const { token } = response.data;
+         const { token } = response.data.data;
          console.log(response.data);
          localStorage.setItem('token', token);
          router.push('/dashboard');

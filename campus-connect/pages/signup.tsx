@@ -21,12 +21,15 @@ const Signup = () => {
          const response = await axios.post('http://localhost:5000/api/auth/register/', { role, email, password, name: username });
          console.log(response.data);
          setIsSigningUp(false);
-         toast.success('User created successfully', { position: "top-right" });
+         toast.success('User created successfully, check your email to verify your account', { position: "top-right" });
 
       } catch (error: any) {
          console.error(error);
          setError(error.response.data.message);
          setIsSigningUp(false);
+      }
+      finally {
+         setError('');
       }
    };
 

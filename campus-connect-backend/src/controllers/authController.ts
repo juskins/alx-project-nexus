@@ -91,7 +91,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       }
 
       // Check for user
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).select('+password');
       if (!user) {
          res.status(401).json({ message: 'Invalid credentials', success: false });
          return;
@@ -300,6 +300,29 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
       res.status(200).json({
          success: true,
          data: user,
+      });
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || 'Server error',
+      });
+   }
+};
+
+
+// @desc    Logout user / clear cookie
+// @route   POST /api/auth/logout
+// @access  Private
+export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+   try {
+      // Since we're using JWT (stateless authentication), 
+      // the actual logout happens on the client side by removing the token
+      // This endpoint is mainly for logging purposes or if you want to implement token blacklisting
+
+      res.status(200).json({
+         success: true,
+         message: 'User logged out successfully',
+         data: null,
       });
    } catch (error: any) {
       res.status(500).json({
