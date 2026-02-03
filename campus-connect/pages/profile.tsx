@@ -1,81 +1,160 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import EditProfileModal from '@/components/profile/EditProfileModal';
 import Image from 'next/image';
-import { Mail, Linkedin, Link as LinkIcon, Star } from 'lucide-react';
+import { Mail, Linkedin, Link as LinkIcon, Star, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import { getAuthToken } from '@/utils/auth';
+import { toast } from 'sonner';
+
+interface UserProfile {
+   _id: string;
+   name: string;
+   email: string;
+   role: string;
+   bio?: string;
+   avatar?: string;
+   phone?: string;
+   department?: string;
+   studentId?: string;
+   skills?: string[];
+   linkedin?: string;
+   website?: string;
+   createdAt: string;
+}
+
+interface ProfileStats {
+   completedJobs: number;
+   ongoingJobs: number;
+   postedJobs: number;
+}
 
 const Profile = () => {
    const router = useRouter();
+   const [user, setUser] = useState<UserProfile | null>(null);
+   const [stats, setStats] = useState<ProfileStats>({
+      completedJobs: 0,
+      ongoingJobs: 0,
+      postedJobs: 0,
+   });
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
+   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-   // Mock user data - in production, this would come from an API or context
-   const userData = {
-      name: 'Ava Rodriguez',
-      university: 'State University, Class of 2026',
-      bio: 'A motivated student passionate about connecting with campus opportunities. I specialize in event coordination and have a strong background in administrative support roles.',
-      profileImage: '/assets/images/ava-profile.jpg',
-      stats: {
-         completedJobs: 15,
-         ongoingJobs: 2,
-         postedJobs: 0,
-      },
-      skills: [
-         'Event Planning',
-         'Data Entry',
-         'Social Media Management',
-         'Content Creation',
-         'Administrative Support',
-         'Customer Service',
-      ],
-      contact: {
-         email: 'ava.rodriguez@example.edu',
-         linkedin: 'LinkedIn Profile',
-         website: 'Personal Website',
-      },
-      jobHistory: [
-         {
-            title: 'Campus Tour Guide',
-            status: 'completed',
-            pay: '$15/hr',
-            date: '12-01-2025',
-         },
-         {
-            title: 'Library Assistant (Evening Shift)',
-            status: 'ongoing',
-            pay: '$14/hr',
-            date: '11-12-2024',
-         },
-         {
-            title: 'Student Mentor Program Coordinator',
-            status: 'completed',
-            pay: '$18/hr',
-            date: '10-12-2023',
-         },
-         {
-            title: 'Research Assistant for Psychology Dept.',
-            status: 'completed',
-            pay: '$16/hr',
-            date: '09-12-2023',
-         },
-         {
-            title: 'Front Desk Receptionist',
-            status: 'ongoing',
-            pay: '$13/hr',
-            date: '08-12-2024',
-         },
-      ],
-      reviews: [
-         {
-            reviewer: 'Prof. Kim',
-            comment: 'Ava is an incredibly organized and reliable research assistant. Highly recommended!',
-         },
-         {
-            reviewer: 'Student Affairs Office',
-            comment: 'Her event planning skills made our campus orientation a huge success. Excellent communication!',
-         },
-      ],
-      rating: 4.8,
-      reviewCount: 25,
+   useEffect(() => {
+      fetchProfile();
+      fetchStats();
+   }, []);
+
+   const fetchProfile = async () => {
+      try {
+         setLoading(true);
+         const token = getAuthToken();
+
+         if (!token) {
+            router.push('/login');
+            return;
+         }
+
+         const response = await axios.get('http://localhost:5000/api/users/profile', {
+            headers: {
+               Authorization: `Bearer ${token}`,
+            },
+         });
+
+         if (response.data.success) {
+            setUser(response.data.data);
+         }
+      } catch (error: any) {
+         console.error('Error fetching profile:', error);
+         const errorMessage = error.response?.data?.message || 'Failed to load profile';
+         setError(errorMessage);
+         toast.error(errorMessage);
+
+         if (error.response?.status === 401) {
+            router.push('/login');
+         }
+      } finally {
+         setLoading(false);
+      }
    };
+
+   const fetchStats = async () => {
+      try {
+         const token = getAuthToken();
+         if (!token) return;
+
+         // Fetch user's posted jobs
+         const jobsResponse = await axios.get('http://localhost:5000/api/jobs/my-jobs', {
+            headers: {
+               Authorization: `Bearer ${token}`,
+            },
+         });
+
+         if (jobsResponse.data.success) {
+            setStats(prev => ({
+               ...prev,
+               postedJobs: jobsResponse.data.count || 0,
+            }));
+         }
+
+         // TODO: Fetch applied jobs and completed jobs when application system is implemented
+      } catch (error) {
+         console.error('Error fetching stats:', error);
+      }
+   };
+
+   // Get university info from email domain
+   const getUniversityInfo = () => {
+      if (!user?.email) return 'University Student';
+      const domain = user.email.split('@')[1];
+      return domain ? `${domain.split('.')[0]} University` : 'University Student';
+   };
+
+   // Get initials for avatar
+   const getInitials = () => {
+      if (!user?.name) return 'U';
+      return user.name
+         .split(' ')
+         .map(n => n[0])
+         .join('')
+         .toUpperCase()
+         .slice(0, 2);
+   };
+
+   // Loading state
+   if (loading) {
+      return (
+         <DashboardLayout>
+            <div className="max-w-7xl mx-auto px-8 py-12">
+               <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-brand-color" />
+                  <span className="ml-3 text-gray-600">Loading profile...</span>
+               </div>
+            </div>
+         </DashboardLayout>
+      );
+   }
+
+   // Error state
+   if (error || !user) {
+      return (
+         <DashboardLayout>
+            <div className="max-w-7xl mx-auto px-8 py-12">
+               <div className="text-center py-12">
+                  <p className="text-red-500 text-lg mb-4">{error || 'Profile not found'}</p>
+                  <button
+                     onClick={() => router.push('/dashboard')}
+                     className="px-6 py-2 bg-brand-color hover:bg-brand-color/90 text-white rounded-lg transition-colors"
+                  >
+                     Back to Dashboard
+                  </button>
+               </div>
+            </div>
+         </DashboardLayout>
+      );
+   }
 
    return (
       <DashboardLayout>
@@ -87,14 +166,20 @@ const Profile = () => {
                      {/* Profile Image */}
                      <div className="flex justify-center mb-6">
                         <div className="relative">
-                           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100">
-                              <Image
-                                 src={userData.profileImage}
-                                 alt={userData.name}
-                                 width={128}
-                                 height={128}
-                                 className="w-full h-full object-cover"
-                              />
+                           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
+                              {user.avatar ? (
+                                 <Image
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    width={128}
+                                    height={128}
+                                    className="w-full h-full object-cover"
+                                 />
+                              ) : (
+                                 <span className="text-white text-4xl font-bold">
+                                    {getInitials()}
+                                 </span>
+                              )}
                            </div>
                            {/* Online Status */}
                            <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
@@ -103,62 +188,94 @@ const Profile = () => {
 
                      {/* Name and University */}
                      <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{userData.name}</h1>
-                        <p className="text-sm text-gray-600">{userData.university}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{user.name}</h1>
+                        <p className="text-sm text-gray-600 capitalize">{user.role}</p>
+                        <p className="text-sm text-gray-500">{getUniversityInfo()}</p>
                      </div>
 
                      {/* Bio */}
-                     <p className="text-sm text-gray-700 text-center leading-relaxed mb-6">
-                        {userData.bio}
-                     </p>
+                     {user.bio && (
+                        <p className="text-sm text-gray-700 text-center leading-relaxed mb-6">
+                           {user.bio}
+                        </p>
+                     )}
 
                      {/* Edit Profile Button */}
-                     <button className="w-full bg-brand-color hover:bg-brand-color/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors mb-8">
+                     <button
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="w-full bg-brand-color hover:bg-brand-color/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors mb-8"
+                     >
                         Edit Profile
                      </button>
 
                      {/* Skills Section */}
-                     <div className="mb-8">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills</h3>
-                        <div className="flex flex-wrap gap-2">
-                           {userData.skills.map((skill, index) => (
-                              <span
-                                 key={index}
-                                 className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200"
-                              >
-                                 {skill}
-                              </span>
-                           ))}
+                     {user.skills && user.skills.length > 0 && (
+                        <div className="mb-8">
+                           <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills</h3>
+                           <div className="flex flex-wrap gap-2">
+                              {user.skills.map((skill, index) => (
+                                 <span
+                                    key={index}
+                                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200"
+                                 >
+                                    {skill}
+                                 </span>
+                              ))}
+                           </div>
                         </div>
-                     </div>
+                     )}
 
                      {/* Contact Information */}
                      <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
                         <div className="space-y-3">
                            <a
-                              href={`mailto:${userData.contact.email}`}
+                              href={`mailto:${user.email}`}
                               className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
                            >
                               <Mail className="w-4 h-4" />
-                              <span>{userData.contact.email}</span>
+                              <span>{user.email}</span>
                            </a>
-                           <a
-                              href="#"
-                              className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
-                           >
-                              <Linkedin className="w-4 h-4" />
-                              <span>{userData.contact.linkedin}</span>
-                           </a>
-                           <a
-                              href="#"
-                              className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
-                           >
-                              <LinkIcon className="w-4 h-4" />
-                              <span>{userData.contact.website}</span>
-                           </a>
+                           {user.linkedin && (
+                              <a
+                                 href={user.linkedin}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
+                              >
+                                 <Linkedin className="w-4 h-4" />
+                                 <span>LinkedIn Profile</span>
+                              </a>
+                           )}
+                           {user.website && (
+                              <a
+                                 href={user.website}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
+                              >
+                                 <LinkIcon className="w-4 h-4" />
+                                 <span>Personal Website</span>
+                              </a>
+                           )}
                         </div>
                      </div>
+
+                     {/* Department */}
+                     {user.department && (
+                        <div className="mt-6 pt-6 border-t border-gray-200">
+                           <p className="text-sm text-gray-600">Department</p>
+                           <p className="text-base font-semibold text-gray-900">{user.department}</p>
+                        </div>
+                     )}
+
+                     {/* Student ID */}
+                     {user.studentId && (
+                        <div className="mt-4">
+                           <p className="text-sm text-gray-600">Student ID</p>
+                           <p className="text-base font-semibold text-gray-900">{user.studentId}</p>
+                        </div>
+                     )}
                   </div>
                </div>
 
@@ -169,7 +286,7 @@ const Profile = () => {
                      {/* Completed Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {userData.stats.completedJobs}
+                           {stats.completedJobs}
                         </div>
                         <div className="text-sm text-gray-600">Completed Jobs</div>
                      </div>
@@ -177,7 +294,7 @@ const Profile = () => {
                      {/* Ongoing Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {userData.stats.ongoingJobs}
+                           {stats.ongoingJobs}
                         </div>
                         <div className="text-sm text-gray-600">Ongoing Jobs</div>
                      </div>
@@ -185,7 +302,7 @@ const Profile = () => {
                      {/* Posted Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {userData.stats.postedJobs}
+                           {stats.postedJobs}
                         </div>
                         <div className="text-sm text-gray-600">Posted Jobs</div>
                      </div>
@@ -199,98 +316,57 @@ const Profile = () => {
                      >
                         Find More Jobs
                      </button>
-                     <button
-                        onClick={() => router.push('/post-job')}
-                        className="bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors"
-                     >
-                        Post a New Job
-                     </button>
+                     {(user.role === 'employer' || user.role === 'admin') && (
+                        <button
+                           onClick={() => router.push('/post-job')}
+                           className="bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors"
+                        >
+                           Post a New Job
+                        </button>
+                     )}
                   </div>
 
-                  {/* Job History */}
+                  {/* Job History Placeholder */}
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                      <h2 className="text-xl font-bold text-gray-900 mb-6">Job History</h2>
-
-                     {/* Table Header */}
-                     <div className="overflow-x-auto">
-                        <table className="w-full">
-                           <thead>
-                              <tr className="border-b border-gray-200">
-                                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                                    Job Title
-                                 </th>
-                                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                                    Status
-                                 </th>
-                                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                                    Pay
-                                 </th>
-                                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                                    Date
-                                 </th>
-                              </tr>
-                           </thead>
-                           <tbody>
-                              {userData.jobHistory.map((job, index) => (
-                                 <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                                    <td className="py-4 px-4 text-sm text-gray-900">{job.title}</td>
-                                    <td className="py-4 px-4">
-                                       <span
-                                          className={`text-sm ${job.status === 'completed'
-                                             ? 'text-gray-600'
-                                             : 'text-blue-600'
-                                             }`}
-                                       >
-                                          {job.status}
-                                       </span>
-                                    </td>
-                                    <td className="py-4 px-4 text-sm text-gray-700">{job.pay}</td>
-                                    <td className="py-4 px-4 text-sm text-gray-600">{job.date}</td>
-                                 </tr>
-                              ))}
-                           </tbody>
-                        </table>
+                     <div className="text-center py-12">
+                        <p className="text-gray-500 mb-4">
+                           Job history will be available when the application system is implemented.
+                        </p>
+                        <button
+                           onClick={() => router.push('/find-jobs')}
+                           className="px-6 py-2 bg-brand-color hover:bg-brand-color/90 text-white rounded-lg transition-colors"
+                        >
+                           Browse Jobs
+                        </button>
                      </div>
                   </div>
 
-                  {/* Ratings & Reviews */}
+                  {/* Ratings & Reviews Placeholder */}
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                      <h2 className="text-xl font-bold text-gray-900 mb-4">Ratings & Reviews</h2>
-
-                     {/* Rating Summary */}
-                     <div className="flex items-center gap-3 mb-6">
-                        <div className="text-4xl font-bold text-brand-color">{userData.rating}</div>
-                        <div>
-                           <div className="flex items-center gap-1 mb-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                 <Star
-                                    key={star}
-                                    className={`w-5 h-5 ${star <= Math.floor(userData.rating)
-                                       ? 'fill-brand-color text-brand-color'
-                                       : star - 0.5 <= userData.rating
-                                          ? 'fill-brand-color/50 text-brand-color'
-                                          : 'fill-gray-200 text-gray-200'
-                                       }`}
-                                 />
-                              ))}
-                           </div>
-                           <div className="text-sm text-gray-600">({userData.reviewCount} reviews)</div>
-                        </div>
-                     </div>
-
-                     {/* Reviews */}
-                     <div className="space-y-4">
-                        {userData.reviews.map((review, index) => (
-                           <div key={index} className="border-t border-gray-100 pt-4">
-                              <h4 className="font-semibold text-gray-900 mb-2">{review.reviewer}</h4>
-                              <p className="text-sm text-gray-600 italic">{review.comment}</p>
-                           </div>
-                        ))}
+                     <div className="text-center py-12">
+                        <p className="text-gray-500 mb-4">
+                           Reviews will be available when the rating system is implemented.
+                        </p>
                      </div>
                   </div>
                </div>
             </div>
          </div>
+
+         {/* Edit Profile Modal */}
+         {user && (
+            <EditProfileModal
+               isOpen={isEditModalOpen}
+               onClose={() => setIsEditModalOpen(false)}
+               userData={user}
+               onSuccess={() => {
+                  fetchProfile();
+                  fetchStats();
+               }}
+            />
+         )}
       </DashboardLayout>
    );
 };

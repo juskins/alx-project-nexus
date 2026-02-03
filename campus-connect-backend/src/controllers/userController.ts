@@ -20,13 +20,16 @@ export const updateProfile = async (
          return;
       }
 
-      const { name, bio, phone, department, studentId } = req.body;
+      const { name, bio, phone, department, studentId, skills, linkedin, website } = req.body;
 
       user.name = name || user.name;
       user.bio = bio || user.bio;
       user.phone = phone || user.phone;
       user.department = department || user.department;
       user.studentId = studentId || user.studentId;
+      user.skills = skills || user.skills;
+      user.linkedin = linkedin || user.linkedin;
+      user.website = website || user.website;
 
       const updatedUser = await user.save();
 
@@ -90,6 +93,37 @@ export const getUserProfile = async (
 ): Promise<void> => {
    try {
       const user = await User.findById(req.params.id).select('-password');
+
+      if (!user) {
+         res.status(404).json({
+            success: false,
+            message: 'User not found',
+         });
+         return;
+      }
+
+      res.status(200).json({
+         success: true,
+         data: user,
+      });
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || 'Server error',
+      });
+   }
+};
+
+
+// @desc    Get current user's profile
+// @route   GET /api/users/profile
+// @access  Private
+export const getMyProfile = async (
+   req: AuthRequest,
+   res: Response
+): Promise<void> => {
+   try {
+      const user = await User.findById(req.user?._id).select('-password');
 
       if (!user) {
          res.status(404).json({
