@@ -246,3 +246,58 @@ export const getMyJobs = async (
       });
    }
 };
+
+
+// @desc    Get dashboard stats
+// @route   GET /api/jobs/stats
+// @access  Private
+export const getDashboardStats = async (
+   req: AuthRequest,
+   res: Response
+): Promise<void> => {
+   try {
+      const userRole = req.user?.role;
+
+      if (userRole === 'employer' || userRole === 'admin' || userRole === 'student') {
+         // Employer/Admin stats
+         const activeJobs = await Job.countDocuments({
+            postedBy: req.user?._id,
+            status: 'active',
+         });
+
+         // TODO: Add application counts when application model is created
+         const totalApplications = 0;
+         const pendingApplications = 0;
+
+         res.status(200).json({
+            success: true,
+            data: {
+               activeJobs,
+               totalApplications,
+               pendingApplications,
+            },
+         });
+      } else {
+         // Student stats
+         const activeJobs = await Job.countDocuments({ status: 'active' });
+
+         // TODO: Add applied/completed counts when application model is created
+         const appliedJobs = 0;
+         const completedJobs = 0;
+
+         res.status(200).json({
+            success: true,
+            data: {
+               activeJobs,
+               appliedJobs,
+               completedJobs,
+            },
+         });
+      }
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || 'Server error',
+      });
+   }
+};

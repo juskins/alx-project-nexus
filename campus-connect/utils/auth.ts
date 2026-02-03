@@ -3,39 +3,74 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5000/api/auth';
 
 /**
+ * Check if code is running in browser (not SSR)
+ */
+const isBrowser = typeof window !== 'undefined';
+
+/**
  * Logout user - clears token from localStorage and calls backend logout endpoint
  * @returns Promise with logout response
  */
 export const logoutUser = async () => {
    try {
+      if (!isBrowser) return;
+
       const token = localStorage.getItem('token');
 
       if (token) {
-         // Call backend logout endpoint (optional - for logging purposes)
-         await axios.post(`${API_URL}/logout`, {}, {
-            headers: {
-               Authorization: `Bearer ${token}`
+         // Call backend logout endpoint
+         await axios.post(
+            `${API_URL}/logout`,
+            {},
+            {
+               headers: {
+                  Authorization: `Bearer ${token}`,
+               },
             }
-         });
+         );
       }
 
-      // Clear token from localStorage
-      localStorage.removeItem('token');
-
-      // Clear any other user data you might have stored
-      localStorage.removeItem('user');
-
-      return { success: true, message: 'Logged out successfully' };
-   } catch (error: any) {
-      // Even if backend call fails, still clear local storage
+      // Clear localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
 
+      // Redirect to login
+      window.location.href = '/login';
+   } catch (error) {
       console.error('Logout error:', error);
-      return {
-         success: false,
-         message: error.response?.data?.message || 'Logout failed'
-      };
+      // Clear localStorage even if API call fails
+      if (isBrowser) {
+         localStorage.removeItem('token');
+         localStorage.removeItem('user');
+         window.location.href = '/login';
+      }
+   }
+};
+
+/**
+ * Get authentication token from localStorage
+ * @returns Token string or null
+ */
+export const getAuthToken = (): string | null => {
+   if (!isBrowser) return null;
+   return localStorage.getItem('token');
+};
+
+/**
+ * Get stored user data from localStorage
+ * @returns User object or null
+ */
+export const getStoredUser = (): any => {
+   if (!isBrowser) return null;
+
+   const userStr = localStorage.getItem('user');
+   if (!userStr) return null;
+
+   try {
+      return JSON.parse(userStr);
+   } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
    }
 };
 
@@ -44,23 +79,6 @@ export const logoutUser = async () => {
  * @returns boolean
  */
 export const isAuthenticated = (): boolean => {
-   const token = localStorage.getItem('token');
-   return !!token;
-};
-
-/**
- * Get stored auth token
- * @returns string | null
- */
-export const getAuthToken = (): string | null => {
-   return localStorage.getItem('token');
-};
-
-/**
- * Get stored user data
- * @returns object | null
- */
-export const getStoredUser = (): any | null => {
-   const user = localStorage.getItem('user');
-   return user ? JSON.parse(user) : null;
+   if (!isBrowser) return false;
+   return !!localStorage.getItem('token');
 };
