@@ -3,6 +3,8 @@ import DashboardHeader from "../dashboard/DashboardHeader";
 import Footer from "./Footer";
 import Sidebar from "./Sidebar";
 import { useState } from "react";
+import { logoutUser } from "@/utils/auth";
+import { toast } from "sonner";
 
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -10,11 +12,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const router = useRouter();
 
-   const handleLogout = () => {
-      setIsLoggingOut(true);
-      setTimeout(() => {
-         router.push('/login');
-      }, 3000);
+   const handleLogout = async () => {
+      try {
+         setIsLoggingOut(true);
+         const response = await logoutUser();
+         if (response.success) {
+            toast.success(response.message);
+            setTimeout(() => {
+               router.push('/login');
+            }, 5000);
+         }
+      } catch (error) {
+         console.error('Logout error:', error);
+      } finally {
+         setIsLoggingOut(false);
+      }
    };
 
    const toggleSidebar = () => {

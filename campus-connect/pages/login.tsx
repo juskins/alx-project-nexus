@@ -1,18 +1,48 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import api from '@/utils/api';
 
 
 const Login = () => {
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const [showPassword, setShowPassword] = useState(false);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState<null | string>(null);
    const router = useRouter();
+
+   const loginUser = async () => {
+      try {
+         setLoading(true);
+         const response = await api.post('/auth/login', { email, password });
+         const { token, ...userData } = response.data.data;
+
+         // Store token
+         localStorage.setItem('token', token);
+
+         // Store user data (including role for authorization)
+         localStorage.setItem('user', JSON.stringify(userData));
+
+         toast.success('Login successful!', { position: 'top-right' });
+         router.push('/dashboard');
+      } catch (error: any) {
+         console.error('Login failed:', error);
+         setError(error.response?.data?.message || 'Login failed');
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   if (error) {
+      toast.error(error, { position: "top-right" });
+   }
+
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      router.push('/dashboard');
-
+      loginUser();
    };
 
    return (
@@ -25,7 +55,7 @@ const Login = () => {
                {/* Background image slideshow */}
                <div className="absolute inset-0 w-full h-full">
                   {/* Campus illustration placeholder */}
-                  <div className="w-full h-full bg-cover bg-bottom" style={{backgroundImage: "url('/assets/images/loginBg.png')"}}>
+                  <div className="w-full h-full bg-cover bg-bottom" style={{ backgroundImage: "url('/assets/images/loginBg.png')" }}>
                   </div>
                </div>
             </div>
@@ -95,10 +125,10 @@ const Login = () => {
                         type="submit"
                         className="w-full bg-brand-color cursor-pointer hover:bg-brand-green text-white font-semibold py-3 rounded-lg transition-colors"
                      >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                      </button>
 
-                     
+
 
                      {/* Divider */}
                      <div className="relative">
@@ -147,7 +177,7 @@ const Login = () => {
                </div>
             </div>
 
-            
+
          </div>
       </div>
    );

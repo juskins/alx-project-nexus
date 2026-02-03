@@ -1,22 +1,95 @@
 import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { jobs } from '@/constant';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import axios from 'axios';
+import { toast } from 'sonner';
+import api from '@/utils/api';
+
+interface Job {
+   _id: string;
+   title: string;
+   description: string;
+   payRate: number;
+   image: string;
+   address: string;
+   location: string;
+   duration: string;
+   time: string;
+   type: string;
+   category: string;
+   department: string;
+   postedBy: {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+   };
+   createdAt: string;
+}
 
 const JobDetails = () => {
    const router = useRouter();
    const { id } = router.query;
+   const [job, setJob] = useState<Job | null>(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
 
-   // Get the job based on the ID (index)
-   const jobIndex = parseInt(id as string);
-   const job = jobs[jobIndex];
+   useEffect(() => {
+      if (id) {
+         fetchJobDetails();
+      }
+   }, [id]);
 
-   if (!job) {
+   const fetchJobDetails = async () => {
+      try {
+         setLoading(true);
+         setError(null);
+
+         const response = await api.get(`/jobs/${id}`);
+
+         if (response.data.success) {
+            setJob(response.data.data);
+         }
+      } catch (error: any) {
+         console.error('Error fetching job details:', error);
+         const errorMessage = error.response?.data?.message || 'Failed to load job details';
+         setError(errorMessage);
+         toast.error(errorMessage);
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   // Loading state
+   if (loading) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl mx-auto px-8 py-12">
-               <p className="text-gray-500">Job not found</p>
+               <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-brand-color" />
+                  <span className="ml-3 text-gray-600">Loading job details...</span>
+               </div>
+            </div>
+         </DashboardLayout>
+      );
+   }
+
+   // Error state
+   if (error || !job) {
+      return (
+         <DashboardLayout>
+            <div className="max-w-7xl mx-auto px-8 py-12">
+               <div className="text-center py-12">
+                  <p className="text-red-500 text-lg mb-4">{error || 'Job not found'}</p>
+                  <button
+                     onClick={() => router.push('/find-jobs')}
+                     className="px-6 py-2 bg-brand-color hover:bg-brand-color/90 text-white rounded-lg transition-colors"
+                  >
+                     Back to Jobs
+                  </button>
+               </div>
             </div>
          </DashboardLayout>
       );
@@ -57,20 +130,9 @@ const JobDetails = () => {
 
                      {/* Job Description */}
                      <div className="mb-8">
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                           The University IT Services team is seeking a proactive and detail-oriented IT Support
-                           Assistant to help manage and maintain campus technology infrastructure. This is an
-                           excellent opportunity for students looking to gain practical experience in a dynamic
-                           IT environment. Responsibilities include providing technical assistance to students
-                           and faculty, troubleshooting hardware and software issues, and assisting with
-                           network maintenance.
-                        </p>
-                        <p className="text-gray-700 leading-relaxed">
-                           This role requires strong problem-solving skills, a foundational understanding of
-                           computer systems, and excellent communication abilities. Training will be provided,
-                           making it suitable for students eager to learn and contribute to a vital campus
-                           service. Join our team and make a tangible impact on the university's technological
-                           landscape!
+                        <h2 className="text-xl font-semibold text-gray-900 mb-4">Job Description</h2>
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                           {job.description}
                         </p>
                      </div>
 
@@ -79,7 +141,7 @@ const JobDetails = () => {
                         {/* Pay Rate */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Pay Rate</p>
-                           <p className="text-lg font-bold text-gray-900">{job.pay}</p>
+                           <p className="text-lg font-bold text-gray-900">${job.payRate}/hour</p>
                         </div>
 
                         {/* Location */}
@@ -91,15 +153,25 @@ const JobDetails = () => {
                         {/* Duration */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Duration</p>
-                           <p className="text-lg font-bold text-gray-900">
-                              {job.duration || 'Fall Semester 2024'}
-                           </p>
+                           <p className="text-lg font-bold text-gray-900">{job.duration}</p>
                         </div>
 
-                        {/* Hours per Week */}
+                        {/* Time */}
                         <div>
-                           <p className="text-sm text-gray-500 mb-1">Hours per Week</p>
-                           <p className="text-lg font-bold text-gray-900">10-15 hours</p>
+                           <p className="text-sm text-gray-500 mb-1">Preferred Time</p>
+                           <p className="text-lg font-bold text-gray-900">{job.time}</p>
+                        </div>
+
+                        {/* Job Type */}
+                        <div>
+                           <p className="text-sm text-gray-500 mb-1">Job Type</p>
+                           <p className="text-lg font-bold text-gray-900">{job.type}</p>
+                        </div>
+
+                        {/* Category */}
+                        <div>
+                           <p className="text-sm text-gray-500 mb-1">Category</p>
+                           <p className="text-lg font-bold text-gray-900">{job.category}</p>
                         </div>
                      </div>
                   </div>
@@ -119,14 +191,10 @@ const JobDetails = () => {
                      {/* Poster Information */}
                      <div className="text-center bg-white p-6">
                         <div className="relative inline-block mb-4">
-                           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
-                              <Image
-                                 src="/assets/images/professor.jpg"
-                                 alt="Professor Alex Kim"
-                                 width={96}
-                                 height={96}
-                                 className="w-full h-full object-cover"
-                              />
+                           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
+                              <span className="text-white text-3xl font-bold">
+                                 {job.postedBy?.name?.charAt(0).toUpperCase() || 'U'}
+                              </span>
                            </div>
                            {/* Online Status Indicator */}
                            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-3 border-white rounded-full"></div>
@@ -134,12 +202,17 @@ const JobDetails = () => {
 
                         {/* Poster Name */}
                         <h3 className="text-xl font-bold text-gray-900 mb-1">
-                           Professor Alex Kim
+                           {job.postedBy?.name || 'Unknown User'}
                         </h3>
+
+                        {/* Role */}
+                        <p className="text-sm text-gray-600 mb-2 capitalize">
+                           {job.postedBy?.role || 'Employer'}
+                        </p>
 
                         {/* Department */}
                         <p className="text-sm text-gray-600 mb-2">
-                           Computer Science Department
+                           {job.department}
                         </p>
 
                         {/* Contact Info */}

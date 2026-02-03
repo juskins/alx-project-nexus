@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { menuItems } from '@/constant';
 import { Button } from '../ui/button';
 import { LogOut, X } from 'lucide-react';
+import { getStoredUser } from '@/utils/auth';
+import { useMemo } from 'react';
 
 interface SidebarProps {
    handleLogout: () => void;
@@ -12,6 +14,16 @@ interface SidebarProps {
 }
 const Sidebar: React.FC<SidebarProps> = ({ handleLogout, isOpen = true, onClose }) => {
    const router = useRouter();
+   const user = getStoredUser();
+
+   // Filter menu items based on user role
+   const filteredMenuItems = useMemo(() => {
+      if (user?.role === 'student') {
+         // Hide "Post a Job" for students
+         return menuItems.filter(item => item.href !== '/post-job');
+      }
+      return menuItems;
+   }, [user?.role]);
 
    return (
       <>
@@ -47,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout, isOpen = true, onClose 
             {/* Navigation */}
             <nav className="flex-1 p-4">
                <ul className="space-y-2">
-                  {menuItems.map((item, index) => {
+                  {filteredMenuItems.map((item, index) => {
                      const isActive = router.pathname === item.href;
                      const Icon = item.icon;
 

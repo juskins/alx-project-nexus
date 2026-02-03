@@ -2,17 +2,62 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, University, UniversityIcon } from 'lucide-react';
 import Image from 'next/image';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { useRouter } from 'next/router';
+import api from '@/utils/api';
 
 const Signup = () => {
-   const [userType, setUserType] = useState('jobSeeker');
+   const [role, setRole] = useState('student');
+   const [username, setUsername] = useState('');
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const [confirmPassword, setConfirmPassword] = useState('');
-   const [showPassword, setShowPassword] = useState({password: false, confirmPassword: false});
+   const [showPassword, setShowPassword] = useState({ password: false, confirmPassword: false });
+   const [error, setError] = useState('');
+   const [isSigningUp, setIsSigningUp] = useState(false);
+   const router = useRouter();
+
+   const signupUser = async () => {
+      try {
+         setIsSigningUp(true);
+         const response = await api.post('/auth/register/', { role, email, password, name: username });
+         console.log(response.data);
+         setIsSigningUp(false);
+         toast.success('User created successfully, check your email to verify your account', { position: "top-right" });
+         router.push('/login');
+
+      } catch (error: any) {
+         console.error(error);
+         if (error) {
+            toast.error(error.response.data.message || 'error', { position: "top-right" });
+         }
+         setError(error.response.data.message || 'error');
+         setIsSigningUp(false);
+      }
+      finally {
+         setError('');
+      }
+   };
+
+
+
+   // Check if form is valid
+   const isFormValid =
+      email.trim() !== "" &&
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      username.trim() !== "";
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      console.log('Login:', { userType, email, password });
+      if (password !== confirmPassword) {
+         toast.error('Passwords do not match', { position: "top-right" });
+         return;
+      }
+      if (isFormValid) {
+         signupUser();
+      }
    };
 
    return (
@@ -44,20 +89,38 @@ const Signup = () => {
                   </div>
 
                   <form onSubmit={handleSubmit} className="md:space-y-6 space-y-4">
-                     {/* Email Input */}
-                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                           Email
-                        </label>
-                        <input
-                           type="email"
-                           id="email"
-                           value={email}
-                           onChange={(e) => setEmail(e.target.value)}
-                           placeholder="your.email@university.edu"
-                           className="w-full text-gray-700 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
-                           required
-                        />
+                     <div className="grid md:grid-cols-2 gap-4">
+                        {/* Name Input */}
+                        <div>
+                           <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                              Full Name
+                           </label>
+                           <input
+                              type="username"
+                              id="username"
+                              value={username}
+                              onChange={(e) => setUsername(e.target.value)}
+                              placeholder="Enter your full name"
+                              className="w-full text-gray-700 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
+                              required
+                           />
+                        </div>
+
+                        {/* Email Input */}
+                        <div>
+                           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                              Email
+                           </label>
+                           <input
+                              type="email"
+                              id="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="your.email@university.edu"
+                              className="w-full text-gray-700 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
+                              required
+                           />
+                        </div>
                      </div>
 
                      {/* Password Input */}
@@ -77,7 +140,7 @@ const Signup = () => {
                            />
                            <button
                               type="button"
-                              onClick={() => setShowPassword({...showPassword, password: !showPassword.password})}
+                              onClick={() => setShowPassword({ ...showPassword, password: !showPassword.password })}
                               className="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-400"
                            >
                               {showPassword ? 'Hide' : 'Show'}
@@ -102,7 +165,7 @@ const Signup = () => {
                            />
                            <button
                               type="button"
-                              onClick={() => setShowPassword({...showPassword, confirmPassword: !showPassword.confirmPassword})}
+                              onClick={() => setShowPassword({ ...showPassword, confirmPassword: !showPassword.confirmPassword })}
                               className="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-400"
                            >
                               {showPassword.confirmPassword ? 'Hide' : 'Show'}
@@ -113,10 +176,11 @@ const Signup = () => {
                      {/* Login Button */}
                      <button
                         type="submit"
-                        className="w-full bg-brand-green gap-4 items-center flex justify-center cursor-pointer hover:bg-brand-color text-white font-semibold py-3 rounded-lg transition-colors"
+                        className={`${!isFormValid && 'cursor-not-allowed'} w-full bg-brand-green gap-4 items-center flex justify-center cursor-pointer hover:bg-brand-color text-white font-semibold py-3 rounded-lg transition-colors ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                     // disabled={!isFormValid}
                      >
-                        <UniversityIcon className="ml-2" size={20} />
-                        <span>Sign Up with University Email</span>
+                        {isSigningUp ? 'Signing Up...' : <><UniversityIcon className="ml-2" size={20} />
+                           <span>Sign Up with University Email</span></>}
                      </button>
 
                      {/* User Type Selection */}
@@ -128,24 +192,24 @@ const Signup = () => {
                            <label className="flex items-center cursor-pointer">
                               <input
                                  type="radio"
-                                 name="userType"
-                                 value="jobSeeker"
-                                 checked={userType === 'jobSeeker'}
-                                 onChange={(e) => setUserType(e.target.value)}
+                                 name="role"
+                                 value="student"
+                                 checked={role === 'student'}
+                                 onChange={(e) => setRole(e.target.value)}
                                  className="w-4 h-4 text-brand-color border-gray-300 focus:ring-brand-color accent-brand-color"
                               />
-                              <span className="ml-2 text-gray-700">Job Seeker</span>
+                              <span className="ml-2 text-gray-700">Student</span>
                            </label>
                            <label className="flex items-center cursor-pointer">
                               <input
                                  type="radio"
-                                 name="userType"
-                                 value="jobPoster"
-                                 checked={userType === 'jobPoster'}
-                                 onChange={(e) => setUserType(e.target.value)}
+                                 name="role"
+                                 value="employer"
+                                 checked={role === 'employer'}
+                                 onChange={(e) => setRole(e.target.value)}
                                  className="w-4 h-4 text-brand-color border-gray-300 focus:ring-brand-color accent-brand-color"
                               />
-                              <span className="ml-2 text-gray-700">Job Poster</span>
+                              <span className="ml-2 text-gray-700">Employer</span>
                            </label>
                         </div>
                      </div>

@@ -1,7 +1,9 @@
+import { getStoredUser } from '@/utils/auth';
 import { Search, Megaphone } from 'lucide-react';
 import Link from 'next/link';
 
 const QuickActions = () => {
+  const user = getStoredUser();
   const actions = [
     {
       icon: Search,
@@ -14,7 +16,7 @@ const QuickActions = () => {
       icon: Megaphone,
       title: 'List a New Job',
       description: 'Quickly create and post a new job for students.',
-      href: '/post-job',
+      href: (user?.role === 'employer' || user?.role === 'admin') ? '/post-job' : '#',
       iconColor: 'text-brand-color',
     },
   ];

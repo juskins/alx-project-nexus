@@ -1,5 +1,24 @@
-import { createContext, useContext, useState, useMemo, ReactNode } from 'react';
-import { jobs } from '@/constant';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import api from '@/utils/api';
+import { toast } from 'sonner';
+
+interface Job {
+  _id: string;
+  image: string;
+  category: string;
+  department: string;
+  address: string;
+  location: string;
+  title: string;
+  payRate: number;
+  pay?: string;
+  type: string;
+  postedTime?: string;
+  duration: string;
+  time: string;
+  createdAt: string;
+  icon?: any;
+}
 
 interface FilterContextType {
   category: string;
@@ -13,9 +32,14 @@ interface FilterContextType {
   location: string;
   setLocation: (value: string) => void;
   clearAll: () => void;
-  filteredJobs: typeof jobs;
+  filteredJobs: Job[];
   search: string;
   setSearch: (value: string) => void;
+  addJob: (job: Job) => void;
+  allJobs: Job[];
+  loading: boolean;
+  error: string | null;
+  refreshJobs: () => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -27,6 +51,9 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
   const [search, setSearch] = useState('');
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const clearAll = () => {
     setCategory('');
@@ -37,45 +64,86 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     setSearch('');
   };
 
-  // Filter jobs based on selected criteria
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      // Filter by category (job type)
-      if (category && job.type !== category) {
-        return false;
-      }
+  const addJob = (job: Job) => {
+    setAllJobs(prevJobs => [job, ...prevJobs]);
+  };
 
-      // Filter by pay
+  // Fetch jobs from API
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Build query parameters
+      const params: any = {};
+      if (category) params.category = category;
+      if (duration) params.duration = duration;
+      if (time) params.time = time;
+      if (location) params.location = location;
+      if (search) params.search = search;
+
+      // Add pay range filter
       if (pay && pay !== '0') {
-        const jobPayValue = parseFloat(job.pay.replace(/[^0-9.]/g, ''));
-        if (pay === '10-15' && (jobPayValue < 10 || jobPayValue > 15)) return false;
-        if (pay === '15-20' && (jobPayValue < 15 || jobPayValue > 20)) return false;
-        if (pay === '20-25' && (jobPayValue < 20 || jobPayValue > 25)) return false;
-        if (pay === '25+' && jobPayValue < 25) return false;
+        if (pay === '10-15') {
+          params.minPay = 10;
+          params.maxPay = 15;
+        } else if (pay === '15-20') {
+          params.minPay = 15;
+          params.maxPay = 20;
+        } else if (pay === '20-25') {
+          params.minPay = 20;
+          params.maxPay = 25;
+        } else if (pay === '25+') {
+          params.minPay = 25;
+        }
       }
 
-      // Filter by duration
-      if (duration && job.duration !== duration) {
-        return false;
-      }
+      const response = await api.get('/jobs', {
+        params,
+      });
 
-      // Filter by time
-      if (time && job.time !== time) {
-        return false;
-      }
+      if (response.data.success) {
+        // Transform jobs to match frontend format
+        const transformedJobs = response.data.data.map((job: any) => ({
+          ...job,
+          pay: `$${job.payRate}/hour`,
+          postedTime: getTimeAgo(job.createdAt),
+        }));
 
-      // Filter by location
-      if (location && job.location !== location) {
-        return false;
+        setAllJobs(transformedJobs);
       }
+    } catch (error: any) {
+      console.error('Error fetching jobs:', error);
+      setError(error.response?.data?.message || 'Failed to fetch jobs');
+      toast.error('Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // Filter by search
-      if (search && !job.title.toLowerCase().includes(search.toLowerCase()) && !job?.department.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
+  // Helper function to calculate time ago
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const posted = new Date(date);
+    const diffInMs = now.getTime() - posted.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
 
-      return true;
-    });
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} week${Math.floor(diffInDays / 7) > 1 ? 's' : ''} ago`;
+    return `${Math.floor(diffInDays / 30)} month${Math.floor(diffInDays / 30) > 1 ? 's' : ''} ago`;
+  };
+
+  // Refresh jobs function
+  const refreshJobs = () => {
+    fetchJobs();
+  };
+
+  // Fetch jobs on mount and when filters change
+  useEffect(() => {
+    fetchJobs();
   }, [category, pay, duration, time, location, search]);
 
   return (
@@ -94,7 +162,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         search,
         setSearch,
         clearAll,
-        filteredJobs,
+        filteredJobs: allJobs, // Now using API-filtered results
+        addJob,
+        allJobs,
+        loading,
+        error,
+        refreshJobs,
       }}
     >
       {children}

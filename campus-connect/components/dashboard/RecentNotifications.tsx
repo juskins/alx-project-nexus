@@ -32,15 +32,15 @@ const RecentNotifications = () => {
   return (
     <section className="mb-8">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Notifications</h2>
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="border relative border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white/5 text-gray-900 text-xl font-semibold backdrop-blur-sm absolute top-0 left-0 w-full h-full flex items-center justify-center border border-gray-200 rounded-xl">Coming soon...</div>
         {notifications.map((notification, index) => {
           const Icon = notification.icon;
           return (
             <div
               key={index}
-              className={`flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors ${
-                index !== notifications.length - 1 ? 'border-b border-gray-200' : ''
-              }`}
+              className={`flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors ${index !== notifications.length - 1 ? 'border-b border-gray-200' : ''
+                }`}
             >
               <div className="flex-shrink-0 mt-1">
                 <Icon className="w-5 h-5 text-gray-600" />

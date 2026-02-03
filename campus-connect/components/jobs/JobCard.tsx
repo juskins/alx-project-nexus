@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 interface JobCardProps {
+   _id: string;
    image?: string;
    category: string;
    department: string;
@@ -17,6 +18,7 @@ interface JobCardProps {
 }
 
 const JobCard = ({
+   _id,
    image,
    category,
    department,
@@ -32,7 +34,7 @@ const JobCard = ({
    const router = useRouter();
 
    const handleClick = () => {
-      router.push(`/jobs/${jobIndex}`);
+      router.push(`/jobs/${_id}`);
    };
 
    return (
