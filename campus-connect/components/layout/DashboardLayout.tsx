@@ -18,11 +18,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
          const response = await logoutUser();
          if (response.success) {
             toast.success(response.message);
-            router.push('/login');
+            setTimeout(() => {
+               router.push('/login');
+            }, 5000);
          }
       } catch (error) {
          console.error('Logout error:', error);
-         toast.error('Logout failed');
       } finally {
          setIsLoggingOut(false);
       }

@@ -4,6 +4,7 @@ import { Mail, University, UniversityIcon } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useRouter } from 'next/router';
 
 const Signup = () => {
    const [role, setRole] = useState('student');
@@ -14,6 +15,7 @@ const Signup = () => {
    const [showPassword, setShowPassword] = useState({ password: false, confirmPassword: false });
    const [error, setError] = useState('');
    const [isSigningUp, setIsSigningUp] = useState(false);
+   const router = useRouter();
 
    const signupUser = async () => {
       try {
@@ -22,10 +24,14 @@ const Signup = () => {
          console.log(response.data);
          setIsSigningUp(false);
          toast.success('User created successfully, check your email to verify your account', { position: "top-right" });
+         router.push('/login');
 
       } catch (error: any) {
          console.error(error);
-         setError(error.response.data.message);
+         if (error) {
+            toast.error(error.response.data.message || 'error', { position: "top-right" });
+         }
+         setError(error.response.data.message || 'error');
          setIsSigningUp(false);
       }
       finally {
@@ -33,9 +39,7 @@ const Signup = () => {
       }
    };
 
-   if (error) {
-      toast.error(error, { position: "top-right" });
-   }
+
 
    // Check if form is valid
    const isFormValid =

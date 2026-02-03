@@ -260,10 +260,12 @@ export const getDashboardStats = async (
 
       if (userRole === 'employer' || userRole === 'admin' || userRole === 'student') {
          // Employer/Admin stats
-         const activeJobs = await Job.countDocuments({
-            postedBy: req.user?._id,
-            status: 'active',
-         });
+         // const activeJobs = await Job.countDocuments({
+         //    postedBy: req.user?._id,
+         //    status: 'active',
+         // });
+
+         const activeJobs = await Job.countDocuments({ status: 'active' });
 
          // TODO: Add application counts when application model is created
          const totalApplications = 0;

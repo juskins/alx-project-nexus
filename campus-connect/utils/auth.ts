@@ -11,7 +11,7 @@ const isBrowser = typeof window !== 'undefined';
  * Logout user - clears token from localStorage and calls backend logout endpoint
  * @returns Promise with logout response
  */
-export const logoutUser = async () => {
+export const logoutUser = async (): Promise<any> => {
    try {
       if (!isBrowser) return;
 
