@@ -125,8 +125,8 @@ const Overview = () => {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`w-6 h-6 ${stat.iconColor}`} />
+                <div className={`p - 2 rounded - lg ${stat.bgColor} `}>
+                  <Icon className={`w - 6 h - 6 ${stat.iconColor} `} />
                 </div>
               </div>
             </div>
