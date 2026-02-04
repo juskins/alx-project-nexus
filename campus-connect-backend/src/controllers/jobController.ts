@@ -206,7 +206,7 @@ export const deleteJob = async (
       // Check ownership
       if (
          job.postedBy.toString() !== req.user?._id.toString() &&
-         req.user?.role !== 'admin' || req.user?.role !== 'employer'
+         req.user?.role !== 'employer' || req.user?.role !== 'admin'
       ) {
          res.status(403).json({
             success: false,

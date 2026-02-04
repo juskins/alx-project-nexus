@@ -24,6 +24,6 @@ router.get('/stats', protect, getDashboardStats);
 router.route('/:id')
    .get(getJob)
    .put(protect, updateJob)
-   .delete(protect, deleteJob);
+   .delete(protect, authorize('employer', 'admin'), deleteJob);
 
 export default router;

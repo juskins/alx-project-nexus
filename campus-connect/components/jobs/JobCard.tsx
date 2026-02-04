@@ -1,10 +1,15 @@
+import { useFilter } from '@/context/FilterContext';
+import { useFetch } from '@/hooks/useFetch';
 import { JobCardProps } from '@/interfaces';
+import api from '@/utils/api';
 import { getStoredUser } from '@/utils/auth';
 import { RootState } from '@reduxjs/toolkit/query';
-import { MapPin, Tag, Clock, DollarSign, User } from 'lucide-react';
+import { MapPin, Tag, Clock, DollarSign, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 
 const JobCard = ({
@@ -23,16 +28,35 @@ const JobCard = ({
 }: JobCardProps) => {
    const router = useRouter();
    const user = getStoredUser()
+   const [isDeleting, setIsDeleting] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+   const { refreshJobs } = useFilter()
 
    const handleClick = () => {
       router.push(`/jobs/${_id}`);
    };
 
+   const handleDelete = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      try {
+         setIsDeleting(true);
+         setError(null);
+         await api.delete(`/jobs/${_id}`);
+         refreshJobs();
+      } catch (error: any) {
+         setError('Failed to delete job');
+         toast.error(error.message)
+      } finally {
+         setIsDeleting(false);
+         setError(null);
+      }
+   };
+
 
    return (
       <div
-         onClick={handleClick}
-         className="bg-white max-w-[300px] flex-1 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+
+         className="bg-white flex-1 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow  border border-gray-200"
       >
          {/* Image Header with Gradient Overlay */}
          <div className="relative h-40 bg-black/70 overflow-hidden">
@@ -65,11 +89,17 @@ const JobCard = ({
                      <span className="text-xs text-white">{applicants?.includes(user?._id) ? <span className='text-xs text-white bg-green-500/95 backdrop-blur-sm px-3 py-1 rounded-full'>Applied</span> : <span className='text-xs text-white bg-red-500/95 backdrop-blur-sm px-3 py-1 rounded-full'>Not Applied</span>}</span>
                   </div>
                )}
+               {/* Delete Badge */}
+               {(user.role === 'employer' || user.role === 'admin') && (
+                  <button onClick={handleDelete} className="absolute cursor-pointer hover:bg-green-600/95 top-3 right-3 bg-red-600/80 p-1 rounded-full">
+                     <X className='w-4 h-4 text-white' />
+                  </button>
+               )}
             </div>
          </div>
 
          {/* Card Content */}
-         <div className="p-5">
+         <div className="p-5 cursor-pointer" onClick={handleClick}>
             {/* Department and Location */}
             <div className="flex items-start gap-2 mb-3">
                <div className="flex-1 min-w-0">
