@@ -4,58 +4,19 @@ import api from '@/utils/api';
 import { getAuthToken, getStoredUser } from '@/utils/auth';
 import { useRouter } from 'next/router';
 import { DashboardStats } from '@/interfaces';
+import { useFetch } from '@/hooks/useFetch';
 
 
 
 const Overview = () => {
   const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { data: stats, loading, error, refetch } = useFetch<any>('/jobs/stats');
 
   useEffect(() => {
     const user = getStoredUser();
     setUserRole(user?.role || null);
-    fetchDashboardStats();
   }, []);
-
-  const fetchDashboardStats = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = getAuthToken();
-
-      if (!token) {
-        setError('Please login to view dashboard');
-        setLoading(false);
-        return;
-      }
-
-      const response = await api.get('/jobs/stats');
-
-      if (response.data.success) {
-        setStats(response.data.data);
-      }
-    } catch (error: any) {
-      console.error('Error fetching dashboard stats:', error);
-
-      // Handle 401 errors gracefully
-      if (error.response?.status === 401) {
-        setError('Session expired. Please login again.');
-        // Optionally redirect to login after a delay
-        setTimeout(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          router.push('/login');
-        }, 2000);
-      } else {
-        setError(error.response?.data?.message || 'Failed to load stats');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Define stats based on user role
   const getStatsConfig = () => {
@@ -64,21 +25,21 @@ const Overview = () => {
         {
           icon: Briefcase,
           label: 'Active Jobs',
-          value: stats?.activeJobs || 0,
+          value: stats?.data?.activeJobs || 0,
           bgColor: 'bg-green-50',
           iconColor: 'text-green-600',
         },
         {
           icon: FileText,
           label: 'Total Applications',
-          value: stats?.totalApplications || 0,
+          value: stats?.data?.totalApplications || 0,
           bgColor: 'bg-orange-50',
           iconColor: 'text-orange-600',
         },
         {
           icon: CheckCircle,
           label: 'Pending Reviews',
-          value: stats?.pendingApplications || 0,
+          value: stats?.data?.pendingApplications || 0,
           bgColor: 'bg-blue-50',
           iconColor: 'text-blue-600',
         },
@@ -89,21 +50,21 @@ const Overview = () => {
         {
           icon: Briefcase,
           label: 'Available Jobs',
-          value: stats?.activeJobs || 0,
+          value: stats?.data?.activeJobs || 0,
           bgColor: 'bg-green-50',
           iconColor: 'text-green-600',
         },
         {
           icon: FileText,
           label: 'Applied Jobs',
-          value: stats?.appliedJobs || 0,
+          value: stats?.data?.appliedJobs || 0,
           bgColor: 'bg-orange-50',
           iconColor: 'text-orange-600',
         },
         {
           icon: CheckCircle,
           label: 'Completed Jobs',
-          value: stats?.completedJobs || 0,
+          value: stats?.data?.completedJobs || 0,
           bgColor: 'bg-blue-50',
           iconColor: 'text-blue-600',
         },
@@ -133,7 +94,7 @@ const Overview = () => {
           <p className="text-red-600">{error}</p>
           {!error.includes('Session expired') && (
             <button
-              onClick={fetchDashboardStats}
+              onClick={refetch}
               className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
             >
               Retry

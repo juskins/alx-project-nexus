@@ -267,41 +267,52 @@ export const getDashboardStats = async (
    try {
       const userRole = req.user?.role;
 
-      if (userRole === 'employer' || userRole === 'admin' || userRole === 'student') {
-         // Employer/Admin stats
-         // const activeJobs = await Job.countDocuments({
-         //    postedBy: req.user?._id,
-         //    status: 'active',
-         // });
+      if (userRole === 'employer' || userRole === 'admin') {
+         // Employer/Admin stats - jobs they posted
+         const postedJobs = await Job.countDocuments({
+            postedBy: req.user?._id,
+         });
 
-         const activeJobs = await Job.countDocuments({ status: 'active' });
+         const activeJobs = await Job.countDocuments({
+            postedBy: req.user?._id,
+            status: 'active',
+         });
 
-         // TODO: Add application counts when application model is created
-         const totalApplications = 0;
-         const pendingApplications = 0;
+         // TODO: Add completed jobs count when job completion is implemented
+         const completedJobs = 0;
+         const ongoingJobs = activeJobs;
 
          res.status(200).json({
             success: true,
             data: {
+               postedJobs,
+               ongoingJobs,
+               completedJobs,
                activeJobs,
-               totalApplications,
-               pendingApplications,
             },
          });
       } else {
-         // Student stats
+         // Student stats - jobs they applied to
          const activeJobs = await Job.countDocuments({ status: 'active' });
 
-         // TODO: Add applied/completed counts when application model is created
-         const appliedJobs = 0;
+         // Count jobs where the user is in the applicants array
+         const appliedJobs = await Job.countDocuments({
+            applicants: req.user?._id,
+         });
+
+         // TODO: Add completed jobs count when job completion is implemented
          const completedJobs = 0;
+         const ongoingJobs = appliedJobs;
+         const postedJobs = 0; // Students don't post jobs
 
          res.status(200).json({
             success: true,
             data: {
+               postedJobs,
+               ongoingJobs,
+               completedJobs,
                activeJobs,
                appliedJobs,
-               completedJobs,
             },
          });
       }

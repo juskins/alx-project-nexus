@@ -9,95 +9,44 @@ import { getAuthToken } from '@/utils/auth';
 import { toast } from 'sonner';
 import api from '@/utils/api';
 import { ProfileStats, UserProfile } from '@/interfaces';
+import { useFetch } from '@/hooks/useFetch';
 
 
 const Profile = () => {
    const router = useRouter();
-   const [user, setUser] = useState<UserProfile | null>(null);
-   const [stats, setStats] = useState<ProfileStats>({
-      completedJobs: 0,
-      ongoingJobs: 0,
-      postedJobs: 0,
-   });
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+   const { data: stats, error: statsError, loading: statsLoading, refetch: statsRefetch } = useFetch<any>('/jobs/stats');
+   const { data: user, error: fetchError, loading: profileLoading, refetch } = useFetch<any>('/users/profile');
+
+   console.log('Stats:', stats);
+   console.log('User:', user);
 
    useEffect(() => {
-      fetchProfile();
-      fetchStats();
+      refetch();
+      statsRefetch();
    }, []);
 
-   const fetchProfile = async () => {
-      try {
-         setLoading(true);
-         const token = getAuthToken();
-
-         if (!token) {
-            router.push('/login');
-            return;
-         }
-
-         const response = await api.get('/users/profile');
-
-         if (response.data.success) {
-            setUser(response.data.data);
-         }
-      } catch (error: any) {
-         console.error('Error fetching profile:', error);
-         const errorMessage = error.response?.data?.message || 'Failed to load profile';
-         setError(errorMessage);
-         toast.error(errorMessage);
-
-         if (error.response?.status === 401) {
-            router.push('/login');
-         }
-      } finally {
-         setLoading(false);
-      }
-   };
-
-   const fetchStats = async () => {
-      try {
-         const token = getAuthToken();
-         if (!token) return;
-
-         // Fetch user's posted jobs
-         const jobsResponse = await api.get('/jobs/my-jobs');
-
-         if (jobsResponse.data.success) {
-            setStats(prev => ({
-               ...prev,
-               postedJobs: jobsResponse.data.count || 0,
-            }));
-         }
-
-         // TODO: Fetch applied jobs and completed jobs when application system is implemented
-      } catch (error) {
-         console.error('Error fetching stats:', error);
-      }
-   };
 
    // Get university info from email domain
    const getUniversityInfo = () => {
-      if (!user?.email) return 'University Student';
-      const domain = user.email.split('@')[1];
+      if (!user?.data?.email) return 'University Student';
+      const domain = user?.data?.email.split('@')[1];
       return domain ? `${domain.split('.')[0]} University` : 'University Student';
    };
 
    // Get initials for avatar
    const getInitials = () => {
-      if (!user?.name) return 'U';
-      return user.name
+      if (!user?.data?.name) return 'U';
+      return user?.data?.name
          .split(' ')
-         .map(n => n[0])
+         .map((n: any) => n[0])
          .join('')
          .toUpperCase()
          .slice(0, 2);
    };
 
    // Loading state
-   if (loading) {
+   if (profileLoading) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl mx-auto px-8 py-12">
@@ -111,12 +60,12 @@ const Profile = () => {
    }
 
    // Error state
-   if (error || !user) {
+   if (fetchError || !user?.data) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl mx-auto px-8 py-12">
                <div className="text-center py-12">
-                  <p className="text-red-500 text-lg mb-4">{error || 'Profile not found'}</p>
+                  <p className="text-red-500 text-lg mb-4">{fetchError || 'Profile not found'}</p>
                   <button
                      onClick={() => router.push('/dashboard')}
                      className="px-6 py-2 bg-brand-color hover:bg-brand-color/90 text-white rounded-lg transition-colors"
@@ -140,10 +89,10 @@ const Profile = () => {
                      <div className="flex justify-center mb-6">
                         <div className="relative">
                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
-                              {user.avatar ? (
+                              {user?.data.avatar ? (
                                  <Image
-                                    src={user.avatar}
-                                    alt={user.name}
+                                    src={user?.data.avatar}
+                                    alt={user?.data.name}
                                     width={128}
                                     height={128}
                                     className="w-full h-full object-cover"
@@ -161,15 +110,15 @@ const Profile = () => {
 
                      {/* Name and University */}
                      <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{user.name}</h1>
-                        <p className="text-sm text-gray-600 capitalize">{user.role}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{user?.data.name}</h1>
+                        <p className="text-sm text-gray-600 capitalize">{user?.data.role}</p>
                         <p className="text-sm text-gray-500">{getUniversityInfo()}</p>
                      </div>
 
                      {/* Bio */}
-                     {user.bio && (
+                     {user?.data.bio && (
                         <p className="text-sm text-gray-700 text-center leading-relaxed mb-6">
-                           {user.bio}
+                           {user?.data.bio}
                         </p>
                      )}
 
@@ -182,11 +131,11 @@ const Profile = () => {
                      </button>
 
                      {/* Skills Section */}
-                     {user.skills && user.skills.length > 0 && (
+                     {user?.data?.skills && user?.data?.skills.length > 0 && (
                         <div className="mb-8">
                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills</h3>
                            <div className="flex flex-wrap gap-2">
-                              {user.skills.map((skill, index) => (
+                              {user?.data?.skills.map((skill: string, index: number) => (
                                  <span
                                     key={index}
                                     className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200"
@@ -203,15 +152,15 @@ const Profile = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
                         <div className="space-y-3">
                            <a
-                              href={`mailto:${user.email}`}
+                              href={`mailto:${user?.data?.email}`}
                               className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
                            >
                               <Mail className="w-4 h-4" />
-                              <span>{user.email}</span>
+                              <span>{user?.data?.email}</span>
                            </a>
-                           {user.linkedin && (
+                           {user?.data?.linkedin && (
                               <a
-                                 href={user.linkedin}
+                                 href={user?.data?.linkedin}
                                  target="_blank"
                                  rel="noopener noreferrer"
                                  className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
@@ -220,9 +169,9 @@ const Profile = () => {
                                  <span>LinkedIn Profile</span>
                               </a>
                            )}
-                           {user.website && (
+                           {user?.data?.website && (
                               <a
-                                 href={user.website}
+                                 href={user?.data.website}
                                  target="_blank"
                                  rel="noopener noreferrer"
                                  className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
@@ -235,18 +184,18 @@ const Profile = () => {
                      </div>
 
                      {/* Department */}
-                     {user.department && (
+                     {user?.data?.department && (
                         <div className="mt-6 pt-6 border-t border-gray-200">
                            <p className="text-sm text-gray-600">Department</p>
-                           <p className="text-base font-semibold text-gray-900">{user.department}</p>
+                           <p className="text-base font-semibold text-gray-900">{user?.data.department}</p>
                         </div>
                      )}
 
                      {/* Student ID */}
-                     {user.studentId && (
+                     {user?.data?.studentId && (
                         <div className="mt-4">
                            <p className="text-sm text-gray-600">Student ID</p>
-                           <p className="text-base font-semibold text-gray-900">{user.studentId}</p>
+                           <p className="text-base font-semibold text-gray-900">{user?.data.studentId}</p>
                         </div>
                      )}
                   </div>
@@ -259,7 +208,7 @@ const Profile = () => {
                      {/* Completed Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats.completedJobs}
+                           {stats?.data?.completedJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Completed Jobs</div>
                      </div>
@@ -267,7 +216,7 @@ const Profile = () => {
                      {/* Ongoing Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats.ongoingJobs}
+                           {stats?.data?.ongoingJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Ongoing Jobs</div>
                      </div>
@@ -275,7 +224,7 @@ const Profile = () => {
                      {/* Posted Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats.postedJobs}
+                           {stats?.data?.postedJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Posted Jobs</div>
                      </div>
@@ -335,8 +284,8 @@ const Profile = () => {
                onClose={() => setIsEditModalOpen(false)}
                userData={user}
                onSuccess={() => {
-                  fetchProfile();
-                  fetchStats();
+                  refetch();
+                  statsRefetch();
                }}
             />
          )}

@@ -8,41 +8,24 @@ import { toast } from 'sonner';
 import api from '@/utils/api';
 import { JobDetails } from '@/interfaces';
 import { getStoredUser } from '@/utils/auth';
+import { useFetch } from '@/hooks/useFetch';
 
 const JobDetailsPage = () => {
    const router = useRouter();
    const { id } = router.query;
-   const [job, setJob] = useState<JobDetails | null>(null);
-   const [loading, setLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
+   const [loading, setLoading] = useState(true);
    const [isApplying, setIsApplying] = useState(false);
    const user = getStoredUser();
+   const { data: job, loading: jobLoading, error: jobError, refetch } = useFetch<any>(`/jobs/${id}`);
 
    useEffect(() => {
       if (id) {
-         fetchJobDetails();
+         refetch();
       }
    }, [id, isApplying]);
 
-   const fetchJobDetails = async () => {
-      try {
-         setLoading(true);
-         setError(null);
 
-         const response = await api.get(`/jobs/${id}`);
-
-         if (response.data.success) {
-            setJob(response.data.data);
-         }
-      } catch (error: any) {
-         console.error('Error fetching job details:', error);
-         const errorMessage = error.response?.data?.message || 'Failed to load job details';
-         setError(errorMessage);
-         toast.error(errorMessage);
-      } finally {
-         setLoading(false);
-      }
-   };
 
    const handleApply = async () => {
       try {
@@ -65,7 +48,7 @@ const JobDetailsPage = () => {
    };
 
    // Loading state
-   if (loading) {
+   if (jobLoading) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl h-full mx-auto px-8 py-12">
@@ -79,12 +62,12 @@ const JobDetailsPage = () => {
    }
 
    // Error state
-   if (error || !job) {
+   if (jobError || !job?.data) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl mx-auto px-8 py-12">
                <div className="text-center py-12">
-                  <p className="text-red-500 text-lg mb-4">{error || 'Job not found'}</p>
+                  <p className="text-red-500 text-lg mb-4">{jobError || 'Job not found'}</p>
                   <button
                      onClick={() => router.push('/find-jobs')}
                      className="px-6 py-2 bg-brand-color hover:bg-brand-color/90 text-white rounded-lg transition-colors"
@@ -116,14 +99,14 @@ const JobDetailsPage = () => {
                   <div className="lg:col-span-2 p-8 lg:p-12 border-1 border-gray-200 ">
                      {/* Job Title */}
                      <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                        {job.title}
+                        {job.data.title}
                      </h1>
 
                      {/* Job Image */}
                      <div className="mb-8">
                         <Image
-                           src={job.image}
-                           alt={job.title}
+                           src={job.data.image}
+                           alt={job.data.title}
                            width={500}
                            height={300}
                            className="w-full h-auto object-cover rounded-lg"
@@ -134,7 +117,7 @@ const JobDetailsPage = () => {
                      <div className="mb-8">
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Job Description</h2>
                         <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                           {job.description}
+                           {job.data.description}
                         </p>
                      </div>
 
@@ -143,37 +126,37 @@ const JobDetailsPage = () => {
                         {/* Pay Rate */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Pay Rate</p>
-                           <p className="text-lg font-bold text-gray-900">${job.payRate}/hour</p>
+                           <p className="text-lg font-bold text-gray-900">${job.data.payRate}/hour</p>
                         </div>
 
                         {/* Location */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Location</p>
-                           <p className="text-lg font-bold text-gray-900">{job.address}</p>
+                           <p className="text-lg font-bold text-gray-900">{job.data.address}</p>
                         </div>
 
                         {/* Duration */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Duration</p>
-                           <p className="text-lg font-bold text-gray-900">{job.duration}</p>
+                           <p className="text-lg font-bold text-gray-900">{job.data.duration}</p>
                         </div>
 
                         {/* Time */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Preferred Time</p>
-                           <p className="text-lg font-bold text-gray-900">{job.time}</p>
+                           <p className="text-lg font-bold text-gray-900">{job.data.time}</p>
                         </div>
 
                         {/* Job Type */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Job Type</p>
-                           <p className="text-lg font-bold text-gray-900">{job.type}</p>
+                           <p className="text-lg font-bold text-gray-900">{job.data.type}</p>
                         </div>
 
                         {/* Category */}
                         <div>
                            <p className="text-sm text-gray-500 mb-1">Category</p>
-                           <p className="text-lg font-bold text-gray-900">{job.category}</p>
+                           <p className="text-lg font-bold text-gray-900">{job.data.category}</p>
                         </div>
                      </div>
                   </div>
@@ -181,7 +164,7 @@ const JobDetailsPage = () => {
                   {/* Right Column - Poster Info & Actions */}
                   <div className="lg:col-span-1 bg-gray-50 p-8 lg:p-6 lg:py-0 ">
                      {user?.role === 'student' && (
-                        job.applicants?.includes(user._id) ? <div className="w-full bg-green-400/20 text-green-600 w-full py-2 px-6 rounded-md transition-all duration-200 shadow-sm text-center mb-4">Applied</div> : (
+                        job.data.applicants?.includes(user._id) ? <div className="w-full bg-green-400/20 text-green-600 w-full py-2 px-6 rounded-md transition-all duration-200 shadow-sm text-center mb-4">Applied</div> : (
                            <button onClick={handleApply} className="w-full bg-brand-color hover:bg-brand-color/80 text-white font-semibold py-2 px-6 rounded-md transition-all duration-200 shadow-sm hover:shadow-md mb-4">
                               {isApplying ? 'Applying...' : 'Apply Now'}
                            </button>
@@ -198,7 +181,7 @@ const JobDetailsPage = () => {
                         <div className="relative inline-block mb-4">
                            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
                               <span className="text-white text-3xl font-bold">
-                                 {job.postedBy?.name?.charAt(0).toUpperCase() || 'U'}
+                                 {job.data.postedBy?.name?.charAt(0).toUpperCase() || 'U'}
                               </span>
                            </div>
                            {/* Online Status Indicator */}
@@ -207,17 +190,17 @@ const JobDetailsPage = () => {
 
                         {/* Poster Name */}
                         <h3 className="text-xl font-bold text-gray-900 mb-1">
-                           {job.postedBy?.name || 'Unknown User'}
+                           {job.data.postedBy?.name || 'Unknown User'}
                         </h3>
 
                         {/* Role */}
                         <p className="text-sm text-gray-600 mb-2 capitalize">
-                           {job.postedBy?.role || 'Employer'}
+                           {job.data.postedBy?.role || 'Employer'}
                         </p>
 
                         {/* Department */}
                         <p className="text-sm text-gray-600 mb-2">
-                           {job.department}
+                           {job.data.postedBy?.department}
                         </p>
 
                         {/* Contact Info */}

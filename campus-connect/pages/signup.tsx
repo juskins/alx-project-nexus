@@ -6,6 +6,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
 import api from '@/utils/api';
+import { validateEmail } from '@/lib/validators';
 
 const Signup = () => {
    const [role, setRole] = useState('student');
@@ -17,6 +18,10 @@ const Signup = () => {
    const [error, setError] = useState('');
    const [isSigningUp, setIsSigningUp] = useState(false);
    const router = useRouter();
+
+
+   const emailError = validateEmail(email);
+   const passwordError = password === confirmPassword ? null : 'Passwords do not match';
 
    const signupUser = async () => {
       try {
@@ -32,7 +37,6 @@ const Signup = () => {
          if (error) {
             toast.error(error.response.data.message || 'error', { position: "top-right" });
          }
-         setError(error.response.data.message || 'error');
          setIsSigningUp(false);
       }
       finally {
@@ -47,12 +51,18 @@ const Signup = () => {
       email.trim() !== "" &&
       password.trim() !== "" &&
       confirmPassword.trim() !== "" &&
-      username.trim() !== "";
+      username.trim() !== "" &&
+      !emailError &&
+      !passwordError;
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      if (password !== confirmPassword) {
-         toast.error('Passwords do not match', { position: "top-right" });
+      if (passwordError) {
+         toast.error(passwordError, { position: "top-right" });
+         return;
+      }
+      if (emailError) {
+         toast.error(emailError, { position: "top-right" });
          return;
       }
       if (isFormValid) {
@@ -120,6 +130,7 @@ const Signup = () => {
                               className="w-full text-gray-700 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-color focus:border-transparent"
                               required
                            />
+                           {emailError && <p className="text-red-500 text-sm mt-2">{emailError}</p>}
                         </div>
                      </div>
 
@@ -173,11 +184,11 @@ const Signup = () => {
                         </div>
                      </div>
 
-                     {/* Login Button */}
+                     {/* Sign up Button */}
                      <button
                         type="submit"
                         className={`${!isFormValid && 'cursor-not-allowed'} w-full bg-brand-green gap-4 items-center flex justify-center cursor-pointer hover:bg-brand-color text-white font-semibold py-3 rounded-lg transition-colors ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-                     // disabled={!isFormValid}
+                        disabled={!isFormValid}
                      >
                         {isSigningUp ? 'Signing Up...' : <><UniversityIcon className="ml-2" size={20} />
                            <span>Sign Up with University Email</span></>}
