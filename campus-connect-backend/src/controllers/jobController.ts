@@ -354,7 +354,7 @@ export const applyForJob = async (
 
       // Check if user has already applied
       const hasApplied = job.applicants.some(
-         (applicantId) => applicantId.toString() === req.user?._id.toString()
+         (applicantId: any) => applicantId.toString() === req.user?._id.toString()
       );
 
       if (hasApplied) {
