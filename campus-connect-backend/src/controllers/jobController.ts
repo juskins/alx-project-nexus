@@ -7,13 +7,14 @@ import { AuthRequest } from '../middleware/auth';
 // @route   POST /api/jobs
 // @access  Private (Employer/Admin)
 export const createJob = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
       const jobData = {
-         ...req.body,
-         postedBy: req.user?._id,
+         ...authReq.body,
+         postedBy: authReq.user?._id,
       };
 
       const job = await Job.create(jobData);
@@ -140,11 +141,12 @@ export const getJob = async (req: Request, res: Response): Promise<void> => {
 // @route   PUT /api/jobs/:id
 // @access  Private (Owner/Admin)
 export const updateJob = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      let job = await Job.findById(req.params.id);
+      let job = await Job.findById(authReq.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -156,8 +158,8 @@ export const updateJob = async (
 
       // Check ownership
       if (
-         job.postedBy.toString() !== req.user?._id.toString() &&
-         req.user?.role !== 'employer' || req.user?.role !== 'admin'
+         job.postedBy.toString() !== authReq.user?._id.toString() &&
+         authReq.user?.role !== 'employer' || authReq.user?.role !== 'admin'
       ) {
          res.status(403).json({
             success: false,
@@ -166,7 +168,7 @@ export const updateJob = async (
          return;
       }
 
-      job = await Job.findByIdAndUpdate(req.params.id, req.body, {
+      job = await Job.findByIdAndUpdate(authReq.params.id, authReq.body, {
          new: true,
          runValidators: true,
       });
@@ -189,11 +191,12 @@ export const updateJob = async (
 // @route   DELETE /api/jobs/:id
 // @access  Private (Owner/Admin)
 export const deleteJob = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const job = await Job.findById(req.params.id);
+      const job = await Job.findById(authReq.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -205,8 +208,8 @@ export const deleteJob = async (
 
       // Check ownership
       if (
-         job.postedBy.toString() !== req.user?._id.toString() &&
-         req.user?.role !== 'employer' || req.user?.role !== 'admin'
+         job.postedBy.toString() !== authReq.user?._id.toString() &&
+         authReq.user?.role !== 'employer' || authReq.user?.role !== 'admin'
       ) {
          res.status(403).json({
             success: false,
@@ -235,11 +238,12 @@ export const deleteJob = async (
 // @route   GET /api/jobs/my-jobs
 // @access  Private
 export const getMyJobs = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const jobs = await Job.find({ postedBy: req.user?._id }).sort({
+      const jobs = await Job.find({ postedBy: authReq.user?._id }).sort({
          createdAt: -1,
       });
 
@@ -261,20 +265,21 @@ export const getMyJobs = async (
 // @route   GET /api/jobs/stats
 // @access  Private
 export const getDashboardStats = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const userRole = req.user?.role;
+      const userRole = authReq.user?.role;
 
       if (userRole === 'employer' || userRole === 'admin') {
          // Employer/Admin stats - jobs they posted
          const postedJobs = await Job.countDocuments({
-            postedBy: req.user?._id,
+            postedBy: authReq.user?._id,
          });
 
          const activeJobs = await Job.countDocuments({
-            postedBy: req.user?._id,
+            postedBy: authReq.user?._id,
             status: 'active',
          });
 
@@ -297,7 +302,7 @@ export const getDashboardStats = async (
 
          // Count jobs where the user is in the applicants array
          const appliedJobs = await Job.countDocuments({
-            applicants: req.user?._id,
+            applicants: authReq.user?._id,
          });
 
          // TODO: Add completed jobs count when job completion is implemented
@@ -329,11 +334,12 @@ export const getDashboardStats = async (
 // @route   POST /api/jobs/:id/apply
 // @access  Private (Students only)
 export const applyForJob = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const job = await Job.findById(req.params.id);
+      const job = await Job.findById(authReq.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -344,7 +350,7 @@ export const applyForJob = async (
       }
 
       // Prevent job owner from applying to their own job
-      if (job.postedBy.toString() === req.user?._id.toString()) {
+      if (job.postedBy.toString() === authReq.user?._id.toString()) {
          res.status(403).json({
             success: false,
             message: 'You cannot apply to your own job posting',
@@ -354,7 +360,7 @@ export const applyForJob = async (
 
       // Check if user has already applied
       const hasApplied = job.applicants.some(
-         (applicantId: any) => applicantId.toString() === req.user?._id.toString()
+         (applicantId: any) => applicantId.toString() === authReq.user?._id.toString()
       );
 
       if (hasApplied) {
@@ -366,7 +372,7 @@ export const applyForJob = async (
       }
 
       // Add user to applicants array
-      if (!req.user?._id) {
+      if (!authReq.user?._id) {
          res.status(401).json({
             success: false,
             message: 'User not authenticated',
@@ -374,7 +380,7 @@ export const applyForJob = async (
          return;
       }
 
-      job.applicants.push(req.user._id);
+      job.applicants.push(authReq.user._id);
       await job.save();
 
       res.status(200).json({

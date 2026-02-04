@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 
@@ -6,11 +6,12 @@ import { AuthRequest } from '../middleware/auth';
 // @route   PUT /api/users/profile
 // @access  Private
 export const updateProfile = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const user = await User.findById(req.user?._id);
+      const user = await User.findById(authReq.user?._id);
 
       if (!user) {
          res.status(404).json({
@@ -20,7 +21,7 @@ export const updateProfile = async (
          return;
       }
 
-      const { name, bio, phone, department, studentId, skills, linkedin, website } = req.body;
+      const { name, bio, phone, department, studentId, skills, linkedin, website } = authReq.body;
 
       user.name = name || user.name;
       user.bio = bio || user.bio;
@@ -51,11 +52,12 @@ export const updateProfile = async (
 // @route   PUT /api/users/avatar
 // @access  Private
 export const updateAvatar = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const user = await User.findById(req.user?._id);
+      const user = await User.findById(authReq.user?._id);
 
       if (!user) {
          res.status(404).json({
@@ -66,8 +68,8 @@ export const updateAvatar = async (
       }
 
       // Avatar URL will be set by upload middleware
-      if (req.body.avatar) {
-         user.avatar = req.body.avatar;
+      if (authReq.body.avatar) {
+         user.avatar = authReq.body.avatar;
          await user.save();
       }
 
@@ -88,11 +90,12 @@ export const updateAvatar = async (
 // @route   GET /api/users/:id
 // @access  Public
 export const getUserProfile = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const user = await User.findById(req.params.id).select('-password');
+      const user = await User.findById(authReq.params.id).select('-password');
 
       if (!user) {
          res.status(404).json({
@@ -119,11 +122,12 @@ export const getUserProfile = async (
 // @route   GET /api/users/profile
 // @access  Private
 export const getMyProfile = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const user = await User.findById(req.user?._id).select('-password');
+      const user = await User.findById(authReq.user?._id).select('-password');
 
       if (!user) {
          res.status(404).json({
