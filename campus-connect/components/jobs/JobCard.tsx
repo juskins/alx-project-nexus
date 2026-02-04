@@ -1,7 +1,10 @@
 import { JobCardProps } from '@/interfaces';
-import { MapPin, Tag, Clock, DollarSign } from 'lucide-react';
+import { getStoredUser } from '@/utils/auth';
+import { RootState } from '@reduxjs/toolkit/query';
+import { MapPin, Tag, Clock, DollarSign, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 
 
 const JobCard = ({
@@ -16,17 +19,20 @@ const JobCard = ({
    postedTime,
    icon,
    address,
+   applicants,
 }: JobCardProps) => {
    const router = useRouter();
+   const user = getStoredUser()
 
    const handleClick = () => {
       router.push(`/jobs/${_id}`);
    };
 
+
    return (
       <div
          onClick={handleClick}
-         className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+         className="bg-white max-w-[300px] flex-1 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
       >
          {/* Image Header with Gradient Overlay */}
          <div className="relative h-40 bg-black/70 overflow-hidden">
@@ -48,9 +54,17 @@ const JobCard = ({
                </div>
             )}
 
-            {/* Category Badge */}
-            <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full">
-               <span className="text-xs font-semibold text-gray-800">{category}</span>
+            <div className='flex justify-between gap-2'>
+               {/* Category Badge */}
+               <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-gray-800">{category}</span>
+               </div>
+               {/* Apply Badge */}
+               {user.role === 'student' && (
+                  <div className="absolute top-3 right-3 bg-green-500/95 backdrop-blur-sm px-3 py-1 rounded-full">
+                     <span className="text-xs text-white">{applicants?.includes(user?._id) ? 'Applied' : 'Apply'}</span>
+                  </div>
+               )}
             </div>
          </div>
 
@@ -83,10 +97,17 @@ const JobCard = ({
                </div>
             </div>
 
-            {/* Posted Time */}
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 pt-3 border-t border-gray-100">
-               <Clock className="w-3.5 h-3.5" />
-               <span>{postedTime}</span>
+            <div className="flex justify-between items-center">
+               {/* Posted Time */}
+               <div className="flex items-center gap-1.5 text-xs text-gray-500 pt-3 border-t border-gray-100">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{postedTime}</span>
+               </div>
+               {/* Applicants */}
+               <div className="flex items-center gap-1.5 text-xs text-gray-500 pt-3 border-t border-gray-100">
+                  <User className="w-3.5 h-3.5" />
+                  <span>{applicants?.length || 0}</span>
+               </div>
             </div>
          </div>
       </div>

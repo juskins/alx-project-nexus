@@ -15,7 +15,7 @@ export interface IJob extends Document {
    image?: string;
    postedBy: mongoose.Types.ObjectId;
    status: 'active' | 'closed' | 'draft';
-   applicatants:mongoose.Types.ObjectId[];
+   applicants: mongoose.Types.ObjectId[];
    createdAt: Date;
    updatedAt: Date;
 }
@@ -32,17 +32,17 @@ const jobSchema = new Schema<IJob>({
       trim: true,
    },
    category: {
-      type:String,
-      required:[true,'Please add a category'],
+      type: String,
+      required: [true, 'Please add a category'],
       enum: [
          'Event Planning',
-        'Administrative',
-        'Research',
-        'Technology',
-        'Customer Service',
-        'Food Service',
-        'Marketing',
-        'Freelance',
+         'Administrative',
+         'Research',
+         'Technology',
+         'Customer Service',
+         'Food Service',
+         'Marketing',
+         'Freelance',
       ]
    },
    department: {
@@ -91,7 +91,7 @@ const jobSchema = new Schema<IJob>({
       ref: 'User',
       required: [true, 'Please add a posted by'],
    },
-   applicatants: {
+   applicants: {
       type: [Schema.Types.ObjectId],
       ref: 'User',
       default: [],
@@ -100,7 +100,7 @@ const jobSchema = new Schema<IJob>({
       type: String,
       enum: ['active', 'closed', 'draft'],
       default: 'active',
-    },
+   },
    createdAt: {
       type: Date,
       default: Date.now,
@@ -109,7 +109,7 @@ const jobSchema = new Schema<IJob>({
       type: Date,
       default: Date.now,
    },
-},{
+}, {
    timestamps: true,
 })
 

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Job from '../models/Job';
 import { AuthRequest } from '../middleware/auth';
 
@@ -304,6 +305,72 @@ export const getDashboardStats = async (
             },
          });
       }
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || 'Server error',
+      });
+   }
+};
+
+
+// @desc    Apply for a job
+// @route   POST /api/jobs/:id/apply
+// @access  Private (Students only)
+export const applyForJob = async (
+   req: AuthRequest,
+   res: Response
+): Promise<void> => {
+   try {
+      const job = await Job.findById(req.params.id);
+
+      if (!job) {
+         res.status(404).json({
+            success: false,
+            message: 'Job not found',
+         });
+         return;
+      }
+
+      // Prevent job owner from applying to their own job
+      if (job.postedBy.toString() === req.user?._id.toString()) {
+         res.status(403).json({
+            success: false,
+            message: 'You cannot apply to your own job posting',
+         });
+         return;
+      }
+
+      // Check if user has already applied
+      const hasApplied = job.applicants.some(
+         (applicantId) => applicantId.toString() === req.user?._id.toString()
+      );
+
+      if (hasApplied) {
+         res.status(400).json({
+            success: false,
+            message: 'You have already applied for this job',
+         });
+         return;
+      }
+
+      // Add user to applicants array
+      if (!req.user?._id) {
+         res.status(401).json({
+            success: false,
+            message: 'User not authenticated',
+         });
+         return;
+      }
+
+      job.applicants.push(req.user._id);
+      await job.save();
+
+      res.status(200).json({
+         success: true,
+         message: 'Successfully applied for the job',
+         data: job,
+      });
    } catch (error: any) {
       res.status(500).json({
          success: false,

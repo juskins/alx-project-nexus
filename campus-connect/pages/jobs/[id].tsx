@@ -7,6 +7,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import api from '@/utils/api';
 import { JobDetails } from '@/interfaces';
+import { getStoredUser } from '@/utils/auth';
 
 const JobDetailsPage = () => {
    const router = useRouter();
@@ -14,12 +15,14 @@ const JobDetailsPage = () => {
    const [job, setJob] = useState<JobDetails | null>(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
+   const [isApplying, setIsApplying] = useState(false);
+   const user = getStoredUser();
 
    useEffect(() => {
       if (id) {
          fetchJobDetails();
       }
-   }, [id]);
+   }, [id, isApplying]);
 
    const fetchJobDetails = async () => {
       try {
@@ -38,6 +41,26 @@ const JobDetailsPage = () => {
          toast.error(errorMessage);
       } finally {
          setLoading(false);
+      }
+   };
+
+   const handleApply = async () => {
+      try {
+         setIsApplying(true);
+         setError(null);
+
+         const response = await api.post(`/jobs/apply/${id}`);
+
+         if (response.data.success) {
+            toast.success(response.data.message);
+         }
+      } catch (error: any) {
+         console.error('Error applying for job:', error);
+         const errorMessage = error.response?.data?.message || 'Failed to apply for job';
+         setError(errorMessage);
+         toast.error(errorMessage);
+      } finally {
+         setIsApplying(false);
       }
    };
 
@@ -157,13 +180,16 @@ const JobDetailsPage = () => {
 
                   {/* Right Column - Poster Info & Actions */}
                   <div className="lg:col-span-1 bg-gray-50 p-8 lg:p-6 lg:py-0 ">
-                     {/* Apply Now Button */}
-                     <button className="w-full bg-brand-color hover:bg-brand-color/80 text-white font-semibold py-2 px-6 rounded-md transition-all duration-200 shadow-sm hover:shadow-md mb-4">
-                        Apply Now
-                     </button>
+                     {user?.role === 'student' && (
+                        job.applicants?.includes(user._id) ? <div className="w-full bg-green-400/20 text-green-600 w-full py-2 px-6 rounded-md transition-all duration-200 shadow-sm text-center mb-4">Applied</div> : (
+                           <button onClick={handleApply} className="w-full bg-brand-color hover:bg-brand-color/80 text-white font-semibold py-2 px-6 rounded-md transition-all duration-200 shadow-sm hover:shadow-md mb-4">
+                              {isApplying ? 'Applying...' : 'Apply Now'}
+                           </button>
+                        )
+                     )}
 
                      {/* Message Poster Button */}
-                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-6 rounded-md transition-all duration-200 border-1 border-gray-300 hover:border-gray-400 mb-8">
+                     <button onClick={() => router.push(`/messages`)} className="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-6 rounded-md transition-all duration-200 border-1 border-gray-300 hover:border-gray-400 mb-8">
                         Message Poster
                      </button>
 

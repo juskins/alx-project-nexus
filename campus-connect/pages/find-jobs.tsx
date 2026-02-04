@@ -46,7 +46,7 @@ const FindJobsContent = () => {
 
             {/* Jobs Grid */}
             {!loading && !error && (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+               <div className="flex flex-wrap gap-6 mb-12">
                   {filteredJobs.length > 0 ? (
                      filteredJobs.map((job, index) => {
                         const IconComponent = job.icon;
@@ -54,7 +54,6 @@ const FindJobsContent = () => {
                            <JobCard
                               key={job._id}
                               _id={job._id}
-                              jobIndex={index}
                               image={job.image}
                               category={job.category}
                               department={job.department}
@@ -63,13 +62,14 @@ const FindJobsContent = () => {
                               pay={job.pay || `$${job.payRate}/hour`}
                               address={job.address}
                               type={job.type}
+                              applicants={job?.applicants}
                               postedTime={job.postedTime || 'Recently'}
                               icon={IconComponent ? <IconComponent /> : undefined}
                            />
                         );
                      })
                   ) : (
-                     <div className="col-span-full text-center py-12">
+                     <div className="flex justify-center items-center w-full flex-col  text-center py-12">
                         <p className="text-gray-500 text-lg">No jobs found matching your filters.</p>
                         <button
                            onClick={clearAll}
