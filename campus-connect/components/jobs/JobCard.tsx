@@ -1,21 +1,8 @@
+import { JobCardProps } from '@/interfaces';
 import { MapPin, Tag, Clock, DollarSign } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
-interface JobCardProps {
-   _id: string;
-   image?: string;
-   category: string;
-   department: string;
-   location: string;
-   title: string;
-   pay: string;
-   type: string;
-   postedTime: string;
-   icon?: React.ReactNode;
-   address: string;
-   jobIndex: number;
-}
 
 const JobCard = ({
    _id,
@@ -29,7 +16,6 @@ const JobCard = ({
    postedTime,
    icon,
    address,
-   jobIndex,
 }: JobCardProps) => {
    const router = useRouter();
 

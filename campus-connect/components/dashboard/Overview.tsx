@@ -3,14 +3,9 @@ import { useState, useEffect } from 'react';
 import api from '@/utils/api';
 import { getAuthToken, getStoredUser } from '@/utils/auth';
 import { useRouter } from 'next/router';
+import { DashboardStats } from '@/interfaces';
 
-interface DashboardStats {
-  activeJobs: number;
-  appliedJobs?: number;
-  completedJobs?: number;
-  totalApplications?: number;
-  pendingApplications?: number;
-}
+
 
 const Overview = () => {
   const router = useRouter();

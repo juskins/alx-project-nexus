@@ -8,28 +8,8 @@ import axios from 'axios';
 import { getAuthToken } from '@/utils/auth';
 import { toast } from 'sonner';
 import api from '@/utils/api';
+import { ProfileStats, UserProfile } from '@/interfaces';
 
-interface UserProfile {
-   _id: string;
-   name: string;
-   email: string;
-   role: string;
-   bio?: string;
-   avatar?: string;
-   phone?: string;
-   department?: string;
-   studentId?: string;
-   skills?: string[];
-   linkedin?: string;
-   website?: string;
-   createdAt: string;
-}
-
-interface ProfileStats {
-   completedJobs: number;
-   ongoingJobs: number;
-   postedJobs: number;
-}
 
 const Profile = () => {
    const router = useRouter();

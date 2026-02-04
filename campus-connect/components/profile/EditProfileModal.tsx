@@ -4,23 +4,7 @@ import axios from 'axios';
 import { getAuthToken } from '@/utils/auth';
 import { toast } from 'sonner';
 import api from '@/utils/api';
-
-interface EditProfileModalProps {
-   isOpen: boolean;
-   onClose: () => void;
-   userData: {
-      name: string;
-      email: string;
-      bio?: string;
-      phone?: string;
-      department?: string;
-      studentId?: string;
-      skills?: string[];
-      linkedin?: string;
-      website?: string;
-   };
-   onSuccess: () => void;
-}
+import { EditProfileModalProps } from '@/interfaces';
 
 const EditProfileModal = ({ isOpen, onClose, userData, onSuccess }: EditProfileModalProps) => {
    const [formData, setFormData] = useState({

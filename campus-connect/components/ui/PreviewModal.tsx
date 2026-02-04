@@ -1,20 +1,8 @@
 import { X, MapPin, DollarSign, Clock, Calendar } from 'lucide-react';
 import { useEffect } from 'react';
 import Image from 'next/image';
+import { PreviewModalProps } from '@/interfaces';
 
-interface PreviewModalProps {
-   isOpen: boolean;
-   onClose: () => void;
-   jobData: {
-      jobTitle: string;
-      jobDescription: string;
-      payRate: string;
-      category: string;
-      location: string;
-      duration: string;
-   };
-   image?: string;
-}
 
 const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, jobData, image }) => {
    useEffect(() => {
