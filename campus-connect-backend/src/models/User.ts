@@ -86,7 +86,7 @@ const userSchema = new Schema<IUser>({
    });
 
 // Hash password before saving
-userSchema.pre('save', async function () {
+userSchema.pre('save', async function (this: IUser) {
    if (!this.isModified('password')) {
       return;
    }
