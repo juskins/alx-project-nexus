@@ -54,15 +54,15 @@ const JobCard = ({
                </div>
             )}
 
-            <div className='flex justify-between gap-2'>
+            <div className='flex flex-wrap gap-2'>
                {/* Category Badge */}
                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full">
                   <span className="text-xs font-semibold text-gray-800">{category}</span>
                </div>
                {/* Apply Badge */}
                {user.role === 'student' && (
-                  <div className="absolute top-3 right-3 bg-green-500/95 backdrop-blur-sm px-3 py-1 rounded-full">
-                     <span className="text-xs text-white">{applicants?.includes(user?._id) ? 'Applied' : 'Apply'}</span>
+                  <div className="absolute top-14 left-3 backdrop-blur-sm px-3 py-1 rounded-full">
+                     <span className="text-xs text-white">{applicants?.includes(user?._id) ? <span className='text-xs text-white bg-green-500/95 backdrop-blur-sm px-3 py-1 rounded-full'>Applied</span> : <span className='text-xs text-white bg-red-500/95 backdrop-blur-sm px-3 py-1 rounded-full'>Not Applied</span>}</span>
                   </div>
                )}
             </div>
