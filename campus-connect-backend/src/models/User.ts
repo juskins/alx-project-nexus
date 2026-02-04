@@ -1,7 +1,8 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types, HydratedDocument } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
+   _id: Types.ObjectId;
    name: string;
    email: string;
    password: string;
@@ -85,7 +86,7 @@ const userSchema = new Schema<IUser>({
    });
 
 // Hash password before saving
-userSchema.pre('save', async function () {
+userSchema.pre('save', async function (this: HydratedDocument<IUser>) {
    if (!this.isModified('password')) {
       return;
    }
