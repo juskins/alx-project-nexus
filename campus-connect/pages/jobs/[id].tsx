@@ -6,33 +6,12 @@ import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'sonner';
 import api from '@/utils/api';
+import { JobDetails } from '@/interfaces';
 
-interface Job {
-   _id: string;
-   title: string;
-   description: string;
-   payRate: number;
-   image: string;
-   address: string;
-   location: string;
-   duration: string;
-   time: string;
-   type: string;
-   category: string;
-   department: string;
-   postedBy: {
-      _id: string;
-      name: string;
-      email: string;
-      role: string;
-   };
-   createdAt: string;
-}
-
-const JobDetails = () => {
+const JobDetailsPage = () => {
    const router = useRouter();
    const { id } = router.query;
-   const [job, setJob] = useState<Job | null>(null);
+   const [job, setJob] = useState<JobDetails | null>(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
 
@@ -228,4 +207,4 @@ const JobDetails = () => {
    );
 };
 
-export default JobDetails;
+export default JobDetailsPage;

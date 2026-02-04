@@ -1,46 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '@/utils/api';
 import { toast } from 'sonner';
+import { FilterContextType, Job } from '@/interfaces';
 
-interface Job {
-  _id: string;
-  image: string;
-  category: string;
-  department: string;
-  address: string;
-  location: string;
-  title: string;
-  payRate: number;
-  pay?: string;
-  type: string;
-  postedTime?: string;
-  duration: string;
-  time: string;
-  createdAt: string;
-  icon?: any;
-}
-
-interface FilterContextType {
-  category: string;
-  setCategory: (value: string) => void;
-  pay: string;
-  setPay: (value: string) => void;
-  duration: string;
-  setDuration: (value: string) => void;
-  time: string;
-  setTime: (value: string) => void;
-  location: string;
-  setLocation: (value: string) => void;
-  clearAll: () => void;
-  filteredJobs: Job[];
-  search: string;
-  setSearch: (value: string) => void;
-  addJob: (job: Job) => void;
-  allJobs: Job[];
-  loading: boolean;
-  error: string | null;
-  refreshJobs: () => void;
-}
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
