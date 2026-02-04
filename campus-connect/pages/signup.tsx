@@ -232,17 +232,17 @@ const Signup = () => {
 
 
                      {/* Divider */}
-                     <div className="relative">
+                     {/* <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                            <div className="w-full border-t border-gray-300"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
                            <span className="px-4 text-gray-500">OR</span>
                         </div>
-                     </div>
+                     </div> */}
 
                      {/* Google Sign In */}
-                     <button
+                     {/* <button
                         type="button"
                         className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors"
                      >
@@ -265,9 +265,9 @@ const Signup = () => {
                            />
                         </svg>
                         Sign Up with Google
-                     </button>
+                     </button> */}
 
-                     {/* Sign Up Link */}
+                     {/* Sign In Link */}
                      <div className="text-center text-sm text-gray-600">
                         Already have an account?{' '}
                         <Link href="/login" className="text-brand-green font-bold hover:text-brand-green">

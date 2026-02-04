@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import { Toaster } from "@/components/ui/sonner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Poppins } from "next/font/google";
@@ -12,11 +13,13 @@ const poppins = Poppins({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <main className={poppins.className}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-      <Toaster richColors />
-    </main>
+    <ErrorBoundary>
+      <main className={poppins.className}>
+        <Layout>
+          <Component {...pageProps} />
+          <Toaster richColors />
+        </Layout>
+      </main>
+    </ErrorBoundary>
   );
 }
