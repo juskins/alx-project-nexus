@@ -14,6 +14,7 @@ export interface Job {
    time: string;
    createdAt: string;
    icon?: any;
+   applicants?: string[];
 }
 
 export interface FilterContextType {
@@ -75,6 +76,7 @@ export interface JobCardProps {
    postedTime: string;
    icon?: React.ReactNode;
    address: string;
+   applicants?: string[];
 }
 
 export interface EditProfileModalProps {
@@ -144,6 +146,7 @@ export interface JobDetails {
    type: string;
    category: string;
    department: string;
+   applicants: string[];
    postedBy: {
       _id: string;
       name: string;

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Job from '../models/Job';
 import { AuthRequest } from '../middleware/auth';
 
@@ -205,7 +206,7 @@ export const deleteJob = async (
       // Check ownership
       if (
          job.postedBy.toString() !== req.user?._id.toString() &&
-         req.user?.role !== 'admin' || req.user?.role !== 'employer'
+         req.user?.role !== 'employer' || req.user?.role !== 'admin'
       ) {
          res.status(403).json({
             success: false,
@@ -266,44 +267,121 @@ export const getDashboardStats = async (
    try {
       const userRole = req.user?.role;
 
-      if (userRole === 'employer' || userRole === 'admin' || userRole === 'student') {
-         // Employer/Admin stats
-         // const activeJobs = await Job.countDocuments({
-         //    postedBy: req.user?._id,
-         //    status: 'active',
-         // });
+      if (userRole === 'employer' || userRole === 'admin') {
+         // Employer/Admin stats - jobs they posted
+         const postedJobs = await Job.countDocuments({
+            postedBy: req.user?._id,
+         });
 
-         const activeJobs = await Job.countDocuments({ status: 'active' });
+         const activeJobs = await Job.countDocuments({
+            postedBy: req.user?._id,
+            status: 'active',
+         });
 
-         // TODO: Add application counts when application model is created
-         const totalApplications = 0;
-         const pendingApplications = 0;
+         // TODO: Add completed jobs count when job completion is implemented
+         const completedJobs = 0;
+         const ongoingJobs = activeJobs;
 
          res.status(200).json({
             success: true,
             data: {
+               postedJobs,
+               ongoingJobs,
+               completedJobs,
                activeJobs,
-               totalApplications,
-               pendingApplications,
             },
          });
       } else {
-         // Student stats
+         // Student stats - jobs they applied to
          const activeJobs = await Job.countDocuments({ status: 'active' });
 
-         // TODO: Add applied/completed counts when application model is created
-         const appliedJobs = 0;
+         // Count jobs where the user is in the applicants array
+         const appliedJobs = await Job.countDocuments({
+            applicants: req.user?._id,
+         });
+
+         // TODO: Add completed jobs count when job completion is implemented
          const completedJobs = 0;
+         const ongoingJobs = appliedJobs;
+         const postedJobs = 0; // Students don't post jobs
 
          res.status(200).json({
             success: true,
             data: {
+               postedJobs,
+               ongoingJobs,
+               completedJobs,
                activeJobs,
                appliedJobs,
-               completedJobs,
             },
          });
       }
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || 'Server error',
+      });
+   }
+};
+
+
+// @desc    Apply for a job
+// @route   POST /api/jobs/:id/apply
+// @access  Private (Students only)
+export const applyForJob = async (
+   req: AuthRequest,
+   res: Response
+): Promise<void> => {
+   try {
+      const job = await Job.findById(req.params.id);
+
+      if (!job) {
+         res.status(404).json({
+            success: false,
+            message: 'Job not found',
+         });
+         return;
+      }
+
+      // Prevent job owner from applying to their own job
+      if (job.postedBy.toString() === req.user?._id.toString()) {
+         res.status(403).json({
+            success: false,
+            message: 'You cannot apply to your own job posting',
+         });
+         return;
+      }
+
+      // Check if user has already applied
+      const hasApplied = job.applicants.some(
+         (applicantId) => applicantId.toString() === req.user?._id.toString()
+      );
+
+      if (hasApplied) {
+         res.status(400).json({
+            success: false,
+            message: 'You have already applied for this job',
+         });
+         return;
+      }
+
+      // Add user to applicants array
+      if (!req.user?._id) {
+         res.status(401).json({
+            success: false,
+            message: 'User not authenticated',
+         });
+         return;
+      }
+
+      job.applicants.push(req.user._id);
+      await job.save();
+
+      res.status(200).json({
+         success: true,
+         message: 'Successfully applied for the job',
+         data: job,
+      });
    } catch (error: any) {
       res.status(500).json({
          success: false,

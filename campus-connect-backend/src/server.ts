@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 
-// Load env vars FIRST before any other imports that use them
 dotenv.config();
 
 import express, { Application } from 'express';
@@ -8,22 +7,18 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/database';
-import './config/cloudinary'; // Initialize Cloudinary (after dotenv)
+import './config/cloudinary';
 import { errorHandler } from './middleware/errorHandler';
 
-// Import routes
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import jobRoutes from './routes/jobRoutes';
 import messageRoutes from './routes/messageRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 
-// Connect to database
 connectDB();
 
 const app: Application = express();
-
-// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,7 +34,7 @@ app.use(
 // Rate limiting
 const limiter = rateLimit({
    windowMs: 10 * 60 * 1000, // 10 minutes
-   max: 100, // limit each IP to 100 requests per windowMs
+   max: 500, // limit each IP to 500 requests per windowMs
 });
 app.use('/api', limiter);
 

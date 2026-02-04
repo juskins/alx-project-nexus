@@ -7,6 +7,7 @@ import {
    deleteJob,
    getMyJobs,
    getDashboardStats,
+   applyForJob,
 } from '../controllers/jobController';
 import { protect, authorize } from '../middleware/auth';
 
@@ -17,11 +18,12 @@ router.route('/')
    .post(protect, authorize('employer', 'admin'), createJob);
 
 router.get('/my-jobs', protect, getMyJobs);
+router.post('/apply/:id', protect, authorize('student'), applyForJob);
 router.get('/stats', protect, getDashboardStats);
 
 router.route('/:id')
    .get(getJob)
    .put(protect, updateJob)
-   .delete(protect, deleteJob);
+   .delete(protect, authorize('employer', 'admin'), deleteJob);
 
 export default router;

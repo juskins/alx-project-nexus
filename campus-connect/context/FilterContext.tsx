@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import api from '@/utils/api';
 import { toast } from 'sonner';
 import { FilterContextType, Job } from '@/interfaces';
 import { getTimeAgo } from '@/lib/helpers';
+import { useFetch } from '@/hooks/useFetch';
 
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -15,8 +16,51 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [location, setLocation] = useState('');
   const [search, setSearch] = useState('');
   const [allJobs, setAllJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+
+  const params = useMemo(() => {
+    const p: any = {};
+
+    if (category) p.category = category;
+    if (duration) p.duration = duration;
+    if (time) p.time = time;
+    if (location) p.location = location;
+    if (search) p.search = search;
+
+    if (pay && pay !== "0") {
+      if (pay === "10-15") {
+        p.minPay = 10;
+        p.maxPay = 15;
+      } else if (pay === "15-20") {
+        p.minPay = 15;
+        p.maxPay = 20;
+      } else if (pay === "20-25") {
+        p.minPay = 20;
+        p.maxPay = 25;
+      } else if (pay === "25+") {
+        p.minPay = 25;
+      }
+    }
+
+    return p;
+  }, [category, pay, duration, time, location, search]);
+
+
+  const { data, loading, error, refetch } = useFetch<any>('/jobs', params);
+
+  // Transform the data for your UI
+  useEffect(() => {
+    if (!data?.success) return;
+
+    const transformedJobs = data.data.map((job: any) => ({
+      ...job,
+      pay: `$${job.payRate}/hour`,
+      postedTime: getTimeAgo(job.createdAt),
+    }));
+
+    setAllJobs(transformedJobs);
+  }, [data]);
+
 
   const clearAll = () => {
     setCategory('');
@@ -31,70 +75,13 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     setAllJobs(prevJobs => [job, ...prevJobs]);
   };
 
-  // Fetch jobs from API
-  const fetchJobs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Build query parameters
-      const params: any = {};
-      if (category) params.category = category;
-      if (duration) params.duration = duration;
-      if (time) params.time = time;
-      if (location) params.location = location;
-      if (search) params.search = search;
-
-      // Add pay range filter
-      if (pay && pay !== '0') {
-        if (pay === '10-15') {
-          params.minPay = 10;
-          params.maxPay = 15;
-        } else if (pay === '15-20') {
-          params.minPay = 15;
-          params.maxPay = 20;
-        } else if (pay === '20-25') {
-          params.minPay = 20;
-          params.maxPay = 25;
-        } else if (pay === '25+') {
-          params.minPay = 25;
-        }
-      }
-
-      const response = await api.get('/jobs', {
-        params,
-      });
-
-      if (response.data.success) {
-        // Transform jobs to match frontend format
-        const transformedJobs = response.data.data.map((job: any) => ({
-          ...job,
-          pay: `$${job.payRate}/hour`,
-          postedTime: getTimeAgo(job.createdAt),
-        }));
-
-        setAllJobs(transformedJobs);
-      }
-    } catch (error: any) {
-      console.error('Error fetching jobs:', error);
-      setError(error.response?.data?.message || 'Failed to fetch jobs');
-      toast.error('Failed to load jobs');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
 
   // Refresh jobs function
   const refreshJobs = () => {
-    fetchJobs();
+    refetch();
   };
 
-  // Fetch jobs on mount and when filters change
-  useEffect(() => {
-    fetchJobs();
-  }, [category, pay, duration, time, location, search]);
+
 
   return (
     <FilterContext.Provider
