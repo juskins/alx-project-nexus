@@ -66,7 +66,7 @@ const JobDetails = () => {
    if (loading) {
       return (
          <DashboardLayout>
-            <div className="max-w-7xl mx-auto px-8 py-12">
+            <div className="max-w-7xl h-full mx-auto px-8 py-12">
                <div className="flex items-center justify-center py-20">
                   <Loader2 className="w-8 h-8 animate-spin text-brand-color" />
                   <span className="ml-3 text-gray-600">Loading job details...</span>

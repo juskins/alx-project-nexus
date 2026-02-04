@@ -62,9 +62,17 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
          if (maxPay) query.payRate.$lte = Number(maxPay);
       }
 
-      // Search
+      // Search across multiple fields
       if (search) {
-         query.$text = { $search: search as string };
+         const searchRegex = { $regex: search as string, $options: 'i' };
+         query.$or = [
+            { title: searchRegex },
+            { description: searchRegex },
+            { department: searchRegex },
+            { category: searchRegex },
+            { type: searchRegex },
+            { address: searchRegex },
+         ];
       }
 
       const pageNum = parseInt(page as string);

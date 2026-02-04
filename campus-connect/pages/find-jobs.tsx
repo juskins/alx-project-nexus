@@ -25,7 +25,7 @@ const FindJobsContent = () => {
 
             {/* Loading State */}
             {loading && (
-               <div className="flex items-center justify-center py-20">
+               <div className="flex h-full items-center justify-center py-20">
                   <Loader2 className="w-8 h-8 animate-spin text-brand-color" />
                   <span className="ml-3 text-gray-600">Loading jobs...</span>
                </div>

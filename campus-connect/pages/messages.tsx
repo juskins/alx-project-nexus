@@ -29,8 +29,9 @@ const Messages = () => {
 
    return (
       <DashboardLayout>
-         <div className="h-[calc(100vh-80px)] max-w-7xl mx-auto px-8 overflow-hidden py-6">
+         <div className="h-[calc(100vh-80px)] relative  max-w-7xl mx-auto px-8 overflow-hidden py-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+               <div className="bg-white/5 text-gray-900 text-xl font-semibold backdrop-blur-sm absolute top-0 left-0 w-full h-full flex items-center justify-center border border-gray-200 rounded-xl">Coming soon...</div>
                {/* Left Sidebar - Conversations List */}
                <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col">
                   {/* Header */}
