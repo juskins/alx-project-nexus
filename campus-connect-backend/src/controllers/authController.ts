@@ -293,9 +293,10 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 // @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private
-export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const user = await User.findById(req.user?._id);
+      const user = await User.findById(authReq.user?._id);
 
       res.status(200).json({
          success: true,
@@ -313,7 +314,8 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
 // @desc    Logout user / clear cookie
 // @route   POST /api/auth/logout
 // @access  Private
-export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+export const logout = async (req: Request, res: Response): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
       // Since we're using JWT (stateless authentication), 
       // the actual logout happens on the client side by removing the token
