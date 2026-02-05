@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import Conversation from '../models/Conversation';
 import Message from '../models/Message';
 import { AuthRequest } from '../middleware/auth';
@@ -7,12 +7,13 @@ import { AuthRequest } from '../middleware/auth';
 // @route   GET /api/messages/conversations
 // @access  Private
 export const getConversations = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
       const conversations = await Conversation.find({
-         participants: req.user?._id,
+         participants: authReq.user?._id,
       })
          .populate('participants', 'name avatar email')
          .sort({ lastMessageTime: -1 });
@@ -35,12 +36,13 @@ export const getConversations = async (
 // @route   GET /api/messages/conversation/:id
 // @access  Private
 export const getMessages = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
       const messages = await Message.find({
-         conversation: req.params.id,
+         conversation: authReq.params.id,
       })
          .populate('sender', 'name avatar')
          .sort({ createdAt: 1 });
@@ -62,27 +64,28 @@ export const getMessages = async (
 // @route   POST /api/messages
 // @access  Private
 export const sendMessage = async (
-   req: AuthRequest,
+   req: Request,
    res: Response
 ): Promise<void> => {
+   const authReq = req as AuthRequest;
    try {
-      const { recipientId, text } = req.body;
+      const { recipientId, text } = authReq.body;
 
       // Find or create conversation
       let conversation = await Conversation.findOne({
-         participants: { $all: [req.user?._id, recipientId] },
+         participants: { $all: [authReq.user?._id, recipientId] },
       });
 
       if (!conversation) {
          conversation = await Conversation.create({
-            participants: [req.user?._id, recipientId],
+            participants: [authReq.user?._id, recipientId],
          });
       }
 
       // Create message
       const message = await Message.create({
          conversation: conversation._id,
-         sender: req.user?._id,
+         sender: authReq.user?._id,
          text,
       });
 
