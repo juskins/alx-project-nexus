@@ -1,19 +1,16 @@
-import { Request, Response } from 'express';
-import Conversation from '../models/Conversation';
-import Message from '../models/Message';
-import { AuthRequest } from '../middleware/auth';
+import Conversation from '../models/Conversation.js';
+import Message from '../models/Message.js';
 
 // @desc    Get user conversations
 // @route   GET /api/messages/conversations
 // @access  Private
 export const getConversations = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
       const conversations = await Conversation.find({
-         participants: authReq.user?._id,
+         participants: req.user?._id,
       })
          .populate('participants', 'name avatar email')
          .sort({ lastMessageTime: -1 });
@@ -22,7 +19,7 @@ export const getConversations = async (
          success: true,
          data: conversations,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -36,13 +33,12 @@ export const getConversations = async (
 // @route   GET /api/messages/conversation/:id
 // @access  Private
 export const getMessages = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
       const messages = await Message.find({
-         conversation: authReq.params.id,
+         conversation: req.params.id,
       })
          .populate('sender', 'name avatar')
          .sort({ createdAt: 1 });
@@ -51,7 +47,7 @@ export const getMessages = async (
          success: true,
          data: messages,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -64,28 +60,27 @@ export const getMessages = async (
 // @route   POST /api/messages
 // @access  Private
 export const sendMessage = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const { recipientId, text } = authReq.body;
+      const { recipientId, text } = req.body;
 
       // Find or create conversation
       let conversation = await Conversation.findOne({
-         participants: { $all: [authReq.user?._id, recipientId] },
+         participants: { $all: [req.user?._id, recipientId] },
       });
 
       if (!conversation) {
          conversation = await Conversation.create({
-            participants: [authReq.user?._id, recipientId],
+            participants: [req.user?._id, recipientId],
          });
       }
 
       // Create message
       const message = await Message.create({
          conversation: conversation._id,
-         sender: authReq.user?._id,
+         sender: req.user?._id,
          text,
       });
 
@@ -103,7 +98,7 @@ export const sendMessage = async (
          success: true,
          data: populatedMessage,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',

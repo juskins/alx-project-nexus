@@ -1,20 +1,19 @@
-import multer, { FileFilterCallback } from 'multer';
-import { Request as ExpressRequest } from 'express';
+import multer from 'multer';
 import path from 'path';
 
 const storage = multer.diskStorage({
-   destination: (req: ExpressRequest, file: Express.Multer.File, cb) => {
+   destination: (req, file, cb) => {
       cb(null, 'uploads/');
    },
-   filename: (req: ExpressRequest, file: Express.Multer.File, cb) => {
+   filename: (req, file, cb) => {
       cb(null, `${Date.now()}-${file.originalname}`);
    },
 });
 
 const fileFilter = (
-   req: ExpressRequest,
-   file: Express.Multer.File,
-   cb: FileFilterCallback
+   req,
+   file,
+   cb
 ) => {
    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
    const extname = allowedTypes.test(
@@ -28,7 +27,7 @@ const fileFilter = (
       cb(
          new Error(
             'Invalid file type. Only JPEG, PNG, PDF, DOC, and DOCX are allowed.'
-         ) as any,
+         ),
          false
       );
    }

@@ -1,12 +1,9 @@
-import User from "../models/User";
-import { Request, Response } from 'express';
-import sendEmail from "../utils/sendEmail";
-import { generateToken } from "../utils/generateToken";
-import crypto, { BinaryLike } from 'crypto';
-import { AuthRequest } from "../middleware/auth";
+import User from "../models/User.js";
+import sendEmail from "../utils/sendEmail.js";
+import { generateToken } from "../utils/generateToken.js";
+import crypto from 'crypto';
 
-
-export const register = async (req: Request, res: Response): Promise<void | Response> => {
+export const register = async (req, res) => {
    try {
       const { name, email, password, role } = req.body;
 
@@ -63,7 +60,7 @@ export const register = async (req: Request, res: Response): Promise<void | Resp
             token: generateToken(user._id.toString()),
          },
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -71,13 +68,10 @@ export const register = async (req: Request, res: Response): Promise<void | Resp
    }
 };
 
-
-
-
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (req, res) => {
    try {
       const { email, password } = req.body;
 
@@ -126,7 +120,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             token,
          },
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -134,12 +128,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
    }
 }
 
-
-
 // @desc    Verify email
 // @route   GET /api/auth/verify-email/:token
 // @access  Public
-export const verifyEmail = async (req: Request, res: Response): Promise<void> => {
+export const verifyEmail = async (req, res) => {
    try {
       const { token } = req.params;
 
@@ -161,7 +153,7 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
          success: true,
          message: 'Email verified successfully',
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -169,12 +161,10 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
    }
 };
 
-
-
 // @desc    Forgot password
 // @route   POST /api/auth/forgot-password
 // @access  Public
-export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+export const forgotPassword = async (req, res) => {
    try {
       const { email } = req.body;
 
@@ -235,7 +225,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
             message: 'Email could not be sent',
          });
       }
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -243,15 +233,14 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
    }
 };
 
-
 // @desc    Reset password
 // @route   PUT /api/auth/reset-password/:token
 // @access  Public
-export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+export const resetPassword = async (req, res) => {
    try {
       const resetPasswordToken = crypto
          .createHash('sha256')
-         .update(req?.params?.token as BinaryLike)
+         .update(req?.params?.token)
          .digest('hex');
 
       const user = await User.findOne({
@@ -280,7 +269,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
             token: generateToken(user._id.toString()),
          },
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -288,21 +277,18 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
    }
 };
 
-
-
 // @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private
-export const getMe = async (req: Request, res: Response): Promise<void> => {
-   const authReq = req as AuthRequest;
+export const getMe = async (req, res) => {
    try {
-      const user = await User.findById(authReq.user?._id);
+      const user = await User.findById(req.user?._id);
 
       res.status(200).json({
          success: true,
          data: user,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -310,23 +296,17 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
    }
 };
 
-
 // @desc    Logout user / clear cookie
 // @route   POST /api/auth/logout
 // @access  Private
-export const logout = async (req: Request, res: Response): Promise<void> => {
-   const authReq = req as AuthRequest;
+export const logout = async (req, res) => {
    try {
-      // Since we're using JWT (stateless authentication), 
-      // the actual logout happens on the client side by removing the token
-      // This endpoint is mainly for logging purposes or if you want to implement token blacklisting
-
       res.status(200).json({
          success: true,
          message: 'User logged out successfully',
          data: null,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',

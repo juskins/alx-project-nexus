@@ -1,11 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-
 export const errorHandler = (
-   err: any,
-   req: Request,
-   res: Response,
-   next: NextFunction
-): void => {
+   err,
+   req,
+   res,
+   next
+) => {
    let error = { ...err };
    error.message = err.message;
 
@@ -27,7 +25,7 @@ export const errorHandler = (
    // Mongoose validation error
    if (err.name === 'ValidationError') {
       const message = Object.values(err.errors)
-         .map((val: any) => val.message)
+         .map((val) => val.message)
          .join(', ');
       error = { message, statusCode: 400 };
    }

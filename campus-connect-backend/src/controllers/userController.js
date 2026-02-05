@@ -1,17 +1,14 @@
-import { Request, Response } from 'express';
-import User from '../models/User';
-import { AuthRequest } from '../middleware/auth';
+import User from '../models/User.js';
 
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
 export const updateProfile = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const user = await User.findById(authReq.user?._id);
+      const user = await User.findById(req.user?._id);
 
       if (!user) {
          res.status(404).json({
@@ -21,7 +18,7 @@ export const updateProfile = async (
          return;
       }
 
-      const { name, bio, phone, department, studentId, skills, linkedin, website } = authReq.body;
+      const { name, bio, phone, department, studentId, skills, linkedin, website } = req.body;
 
       user.name = name || user.name;
       user.bio = bio || user.bio;
@@ -38,7 +35,7 @@ export const updateProfile = async (
          success: true,
          data: updatedUser,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -52,12 +49,11 @@ export const updateProfile = async (
 // @route   PUT /api/users/avatar
 // @access  Private
 export const updateAvatar = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const user = await User.findById(authReq.user?._id);
+      const user = await User.findById(req.user?._id);
 
       if (!user) {
          res.status(404).json({
@@ -68,8 +64,8 @@ export const updateAvatar = async (
       }
 
       // Avatar URL will be set by upload middleware
-      if (authReq.body.avatar) {
-         user.avatar = authReq.body.avatar;
+      if (req.body.avatar) {
+         user.avatar = req.body.avatar;
          await user.save();
       }
 
@@ -77,7 +73,7 @@ export const updateAvatar = async (
          success: true,
          data: user,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -90,12 +86,11 @@ export const updateAvatar = async (
 // @route   GET /api/users/:id
 // @access  Public
 export const getUserProfile = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const user = await User.findById(authReq.params.id).select('-password');
+      const user = await User.findById(req.params.id).select('-password');
 
       if (!user) {
          res.status(404).json({
@@ -109,7 +104,7 @@ export const getUserProfile = async (
          success: true,
          data: user,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -122,12 +117,11 @@ export const getUserProfile = async (
 // @route   GET /api/users/profile
 // @access  Private
 export const getMyProfile = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const user = await User.findById(authReq.user?._id).select('-password');
+      const user = await User.findById(req.user?._id).select('-password');
 
       if (!user) {
          res.status(404).json({
@@ -141,7 +135,7 @@ export const getMyProfile = async (
          success: true,
          data: user,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',

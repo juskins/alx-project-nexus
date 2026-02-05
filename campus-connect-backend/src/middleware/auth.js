@@ -1,16 +1,11 @@
-import { Request as ExpressRequest, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/User';
-
-export interface AuthRequest extends ExpressRequest {
-   user?: IUser;
-}
+import User from '../models/User.js';
 
 export const protect = async (
-   req: AuthRequest,
-   res: Response,
-   next: NextFunction
-): Promise<void> => {
+   req,
+   res,
+   next
+) => {
    try {
       let token;
 
@@ -30,8 +25,8 @@ export const protect = async (
       }
 
       try {
-         const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
-         req.user = (await User.findById(decoded.id)) ?? undefined;
+         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+         req.user = (await User.findById(decoded.id)) || null;
 
          if (!req.user) {
             res.status(401).json({
@@ -56,8 +51,8 @@ export const protect = async (
    }
 };
 
-export const authorize = (...roles: string[]) => {
-   return (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const authorize = (...roles) => {
+   return (req, res, next) => {
       if (!req.user || !roles.includes(req.user.role)) {
          res.status(403).json({
             success: false,
