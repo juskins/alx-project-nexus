@@ -9,6 +9,13 @@ import rateLimit from 'express-rate-limit';
 import connectDB from './config/database.js';
 import './config/cloudinary.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import fs from 'fs';
+
+// Ensure uploads directory exists
+const uploadDir = 'uploads/';
+if (!fs.existsSync(uploadDir)) {
+   fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';

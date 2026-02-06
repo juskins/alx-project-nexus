@@ -69,7 +69,7 @@ const FindJobsContent = () => {
                         );
                      })
                   ) : (
-                     <div className="flex justify-center items-center w-full flex-col  text-center py-12">
+                     <div className="flex justify-center mx-auto items-center w-full flex-col text-center py-12">
                         <p className="text-gray-500 text-lg">No jobs found matching your filters.</p>
                         <button
                            onClick={clearAll}
