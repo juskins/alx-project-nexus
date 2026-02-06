@@ -1,17 +1,6 @@
-import mongoose, { Document, model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
-
-export interface IApplication extends Document {
-   job: mongoose.Types.ObjectId;
-   applicant: mongoose.Types.ObjectId;
-   coverLetter?: string;
-   resume?: string;
-   status: 'pending' | 'reviewed' | 'accepted' | 'rejected';
-   createdAt: Date;
-   updatedAt: Date;
-}
-
-const applicationSchema = new Schema<IApplication>({
+const applicationSchema = new Schema({
    job: {
       type: Schema.Types.ObjectId,
       ref: 'Job',
@@ -46,4 +35,4 @@ const applicationSchema = new Schema<IApplication>({
 // Prevent duplicate applications
 applicationSchema.index({ job: 1, applicant: 1 }, { unique: true });
 
-export default model<IApplication>('Application', applicationSchema);
+export default model('Application', applicationSchema);

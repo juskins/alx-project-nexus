@@ -1,20 +1,16 @@
-import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import Job from '../models/Job';
-import { AuthRequest } from '../middleware/auth';
+import Job from '../models/Job.js';
 
 // @desc    Create new job
 // @route   POST /api/jobs
 // @access  Private (Employer/Admin)
 export const createJob = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
       const jobData = {
-         ...authReq.body,
-         postedBy: authReq.user?._id,
+         ...req.body,
+         postedBy: req.user?._id,
       };
 
       const job = await Job.create(jobData);
@@ -23,7 +19,7 @@ export const createJob = async (
          success: true,
          data: job,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -35,7 +31,7 @@ export const createJob = async (
 // @desc    Get all jobs
 // @route   GET /api/jobs
 // @access  Public
-export const getJobs = async (req: Request, res: Response): Promise<void> => {
+export const getJobs = async (req, res) => {
    try {
       const {
          category,
@@ -49,7 +45,7 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
          limit = 10,
       } = req.query;
 
-      const query: any = { status: 'active' };
+      const query = { status: 'active' };
 
       // Filters
       if (category) query.category = category;
@@ -66,7 +62,7 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
 
       // Search across multiple fields
       if (search) {
-         const searchRegex = { $regex: search as string, $options: 'i' };
+         const searchRegex = { $regex: search, $options: 'i' };
          query.$or = [
             { title: searchRegex },
             { description: searchRegex },
@@ -77,8 +73,8 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
          ];
       }
 
-      const pageNum = parseInt(page as string);
-      const limitNum = parseInt(limit as string);
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
       const skip = (pageNum - 1) * limitNum;
 
       const jobs = await Job.find(query)
@@ -97,7 +93,7 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
          pages: Math.ceil(total / limitNum),
          data: jobs,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -109,7 +105,7 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
 // @desc    Get single job
 // @route   GET /api/jobs/:id
 // @access  Public
-export const getJob = async (req: Request, res: Response): Promise<void> => {
+export const getJob = async (req, res) => {
    try {
       const job = await Job.findById(req.params.id).populate(
          'postedBy',
@@ -128,7 +124,7 @@ export const getJob = async (req: Request, res: Response): Promise<void> => {
          success: true,
          data: job,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -141,12 +137,11 @@ export const getJob = async (req: Request, res: Response): Promise<void> => {
 // @route   PUT /api/jobs/:id
 // @access  Private (Owner/Admin)
 export const updateJob = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      let job = await Job.findById(authReq.params.id);
+      let job = await Job.findById(req.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -158,8 +153,8 @@ export const updateJob = async (
 
       // Check ownership
       if (
-         job.postedBy.toString() !== authReq.user?._id.toString() &&
-         authReq.user?.role !== 'employer' || authReq.user?.role !== 'admin'
+         job.postedBy.toString() !== req.user?._id.toString() &&
+         (req.user?.role !== 'employer' && req.user?.role !== 'admin')
       ) {
          res.status(403).json({
             success: false,
@@ -168,7 +163,7 @@ export const updateJob = async (
          return;
       }
 
-      job = await Job.findByIdAndUpdate(authReq.params.id, authReq.body, {
+      job = await Job.findByIdAndUpdate(req.params.id, req.body, {
          new: true,
          runValidators: true,
       });
@@ -177,7 +172,7 @@ export const updateJob = async (
          success: true,
          data: job,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -191,12 +186,11 @@ export const updateJob = async (
 // @route   DELETE /api/jobs/:id
 // @access  Private (Owner/Admin)
 export const deleteJob = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const job = await Job.findById(authReq.params.id);
+      const job = await Job.findById(req.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -208,8 +202,8 @@ export const deleteJob = async (
 
       // Check ownership
       if (
-         job.postedBy.toString() !== authReq.user?._id.toString() &&
-         authReq.user?.role !== 'employer' || authReq.user?.role !== 'admin'
+         job.postedBy.toString() !== req.user?._id.toString() &&
+         (req.user?.role !== 'employer' && req.user?.role !== 'admin')
       ) {
          res.status(403).json({
             success: false,
@@ -224,7 +218,7 @@ export const deleteJob = async (
          success: true,
          message: 'Job deleted successfully',
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -238,12 +232,11 @@ export const deleteJob = async (
 // @route   GET /api/jobs/my-jobs
 // @access  Private
 export const getMyJobs = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const jobs = await Job.find({ postedBy: authReq.user?._id }).sort({
+      const jobs = await Job.find({ postedBy: req.user?._id }).sort({
          createdAt: -1,
       });
 
@@ -252,7 +245,7 @@ export const getMyJobs = async (
          count: jobs.length,
          data: jobs,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -265,21 +258,20 @@ export const getMyJobs = async (
 // @route   GET /api/jobs/stats
 // @access  Private
 export const getDashboardStats = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const userRole = authReq.user?.role;
+      const userRole = req.user?.role;
 
       if (userRole === 'employer' || userRole === 'admin') {
          // Employer/Admin stats - jobs they posted
          const postedJobs = await Job.countDocuments({
-            postedBy: authReq.user?._id,
+            postedBy: req.user?._id,
          });
 
          const activeJobs = await Job.countDocuments({
-            postedBy: authReq.user?._id,
+            postedBy: req.user?._id,
             status: 'active',
          });
 
@@ -302,7 +294,7 @@ export const getDashboardStats = async (
 
          // Count jobs where the user is in the applicants array
          const appliedJobs = await Job.countDocuments({
-            applicants: authReq.user?._id,
+            applicants: req.user?._id,
          });
 
          // TODO: Add completed jobs count when job completion is implemented
@@ -321,7 +313,7 @@ export const getDashboardStats = async (
             },
          });
       }
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',
@@ -334,12 +326,11 @@ export const getDashboardStats = async (
 // @route   POST /api/jobs/:id/apply
 // @access  Private (Students only)
 export const applyForJob = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      const job = await Job.findById(authReq.params.id);
+      const job = await Job.findById(req.params.id);
 
       if (!job) {
          res.status(404).json({
@@ -350,7 +341,7 @@ export const applyForJob = async (
       }
 
       // Prevent job owner from applying to their own job
-      if (job.postedBy.toString() === authReq.user?._id.toString()) {
+      if (job.postedBy.toString() === req.user?._id.toString()) {
          res.status(403).json({
             success: false,
             message: 'You cannot apply to your own job posting',
@@ -360,7 +351,7 @@ export const applyForJob = async (
 
       // Check if user has already applied
       const hasApplied = job.applicants.some(
-         (applicantId: any) => applicantId.toString() === authReq.user?._id.toString()
+         (applicantId) => applicantId.toString() === req.user?._id.toString()
       );
 
       if (hasApplied) {
@@ -372,7 +363,7 @@ export const applyForJob = async (
       }
 
       // Add user to applicants array
-      if (!authReq.user?._id) {
+      if (!req.user?._id) {
          res.status(401).json({
             success: false,
             message: 'User not authenticated',
@@ -380,7 +371,7 @@ export const applyForJob = async (
          return;
       }
 
-      job.applicants.push(authReq.user._id);
+      job.applicants.push(req.user._id);
       await job.save();
 
       res.status(200).json({
@@ -388,7 +379,7 @@ export const applyForJob = async (
          message: 'Successfully applied for the job',
          data: job,
       });
-   } catch (error: any) {
+   } catch (error) {
       res.status(500).json({
          success: false,
          message: error.message || 'Server error',

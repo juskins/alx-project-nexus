@@ -2,23 +2,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-import express, { Application } from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import connectDB from './config/database';
-import './config/cloudinary';
-import { errorHandler } from './middleware/errorHandler';
+import connectDB from './config/database.js';
+import './config/cloudinary.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes';
-import jobRoutes from './routes/jobRoutes';
-import messageRoutes from './routes/messageRoutes';
-import uploadRoutes from './routes/uploadRoutes';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 connectDB();
 
-const app: Application = express();
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,7 +60,7 @@ const server = app.listen(PORT, () => {
 });
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err: Error) => {
+process.on('unhandledRejection', (err) => {
    console.log(`Error: ${err.message}`);
    server.close(() => process.exit(1));
 });

@@ -1,26 +1,6 @@
-import mongoose, { Document, model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
-
-export interface IJob extends Document {
-   title: string;
-   description: string;
-   category: string;
-   department: string;
-   location: string;
-   address: string;
-   payRate: number;
-   duration: string;
-   time: string;
-   type: string;
-   image?: string;
-   postedBy: mongoose.Types.ObjectId;
-   status: 'active' | 'closed' | 'draft';
-   applicants: mongoose.Types.ObjectId[];
-   createdAt: Date;
-   updatedAt: Date;
-}
-
-const jobSchema = new Schema<IJob>({
+const jobSchema = new Schema({
    title: {
       type: String,
       required: [true, 'Please add a job'],
@@ -114,4 +94,4 @@ const jobSchema = new Schema<IJob>({
 })
 
 jobSchema.index({ title: 'text', description: 'text', category: 'text', department: 'text' });
-export default model<IJob>('Job', jobSchema);
+export default model('Job', jobSchema);

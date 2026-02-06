@@ -8,8 +8,8 @@ import {
    getMyJobs,
    getDashboardStats,
    applyForJob,
-} from '../controllers/jobController';
-import { protect, authorize } from '../middleware/auth';
+} from '../controllers/jobController.js';
+import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 

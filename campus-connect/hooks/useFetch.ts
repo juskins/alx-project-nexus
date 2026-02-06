@@ -20,7 +20,9 @@ export const useFetch = <T>(url: string, params?: any): useFetchResult<T> => {
          const response = await api.get(url, { params });
          setData(response.data);
       } catch (error: any) {
-         setError(error.response.data.message || 'error');
+         console.error('Fetch error:', error);
+         const message = error.response?.data?.message || error.message || 'An error occurred';
+         setError(message);
       } finally {
          setLoading(false);
       }

@@ -1,18 +1,15 @@
-import { Request, Response } from 'express';
-import cloudinary from '../config/cloudinary';
-import { AuthRequest } from '../middleware/auth';
+import cloudinary from '../config/cloudinary.js';
 import fs from 'fs';
 
 // @desc    Upload image to Cloudinary
 // @route   POST /api/upload
 // @access  Private
 export const uploadImage = async (
-   req: Request,
-   res: Response
-): Promise<void> => {
-   const authReq = req as AuthRequest;
+   req,
+   res
+) => {
    try {
-      if (!authReq.file) {
+      if (!req.file) {
          res.status(400).json({
             success: false,
             message: 'No file uploaded',
@@ -21,25 +18,25 @@ export const uploadImage = async (
       }
 
       // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(authReq.file.path, {
+      const result = await cloudinary.uploader.upload(req.file.path, {
          folder: 'campus-connect/jobs',
          resource_type: 'auto',
       });
 
       // Delete local file after upload
-      fs.unlinkSync(authReq.file.path);
+      fs.unlinkSync(req.file.path);
 
       res.status(200).json({
          success: true,
          url: result.secure_url,
          public_id: result.public_id,
       });
-   } catch (error: any) {
+   } catch (error) {
       console.error('Upload error:', error);
 
       // Clean up file if upload fails
-      if (authReq.file && fs.existsSync(authReq.file.path)) {
-         fs.unlinkSync(authReq.file.path);
+      if (req.file && fs.existsSync(req.file.path)) {
+         fs.unlinkSync(req.file.path);
       }
 
       res.status(500).json({

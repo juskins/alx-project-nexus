@@ -1,4 +1,5 @@
 import { getStoredUser } from '@/utils/auth';
+import { useState, useEffect } from 'react';
 import { Bell, CirclePlus, User, Menu } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -8,8 +9,21 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
+   const [mounted, setMounted] = useState(false);
    const router = useRouter();
    const user = getStoredUser();
+
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   if (!mounted) return (
+      <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 fixed top-0 right-0 left-0 lg:left-64 z-10 overflow-hidden">
+         <div className="flex items-center justify-end h-10 w-full">
+            {/* Minimal placeholder to avoid layout shift */}
+         </div>
+      </header>
+   );
 
    return (
       <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 fixed top-0 right-0 left-0 lg:left-64 z-10 overflow-hidden">

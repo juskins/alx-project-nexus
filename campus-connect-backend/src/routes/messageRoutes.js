@@ -3,8 +3,8 @@ import {
    getConversations,
    getMessages,
    sendMessage,
-} from '../controllers/messageController';
-import { protect } from '../middleware/auth';
+} from '../controllers/messageController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 

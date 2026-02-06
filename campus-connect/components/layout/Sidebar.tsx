@@ -5,7 +5,7 @@ import { menuItems } from '@/constant';
 import { Button } from '../ui/button';
 import { LogOut, X } from 'lucide-react';
 import { getStoredUser } from '@/utils/auth';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface SidebarProps {
    handleLogout: () => void;
@@ -13,17 +13,25 @@ interface SidebarProps {
    onClose?: () => void;
 }
 const Sidebar: React.FC<SidebarProps> = ({ handleLogout, isOpen = true, onClose }) => {
+   const [mounted, setMounted] = useState(false);
    const router = useRouter();
    const user = getStoredUser();
 
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
    // Filter menu items based on user role
    const filteredMenuItems = useMemo(() => {
+      if (!mounted) return menuItems; // Server-side or initial client-side render
       if (user?.role === 'student') {
          // Hide "Post a Job" for students
          return menuItems.filter(item => item.href !== '/post-job');
       }
       return menuItems;
-   }, [user?.role]);
+   }, [user?.role, mounted]);
+
+   if (!mounted) return null; // Or return a skeleton/safe version
 
    return (
       <>
