@@ -198,7 +198,7 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSuccess }: EditProfileM
                   <label htmlFor="skills" className="block text-sm font-semibold text-gray-700 mb-2">
                      Skills
                   </label>
-                  <div className="flex gap-2 mb-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                      <input
                         type="text"
                         id="skills"

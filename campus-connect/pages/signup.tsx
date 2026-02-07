@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { Mail, University, UniversityIcon } from 'lucide-react';
-import Image from 'next/image';
-import axios from 'axios';
+import { UniversityIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
 import api from '@/utils/api';

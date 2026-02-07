@@ -16,7 +16,7 @@ const Hero = () => {
                </div>
 
                {/* Main Heading */}
-               <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+               <h1 className="text-3xl md:text-4xl lg:text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                   Your Gateway to On-Campus Opportunities
                </h1>
 

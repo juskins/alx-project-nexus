@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CirclePlus, LogIn } from 'lucide-react';
+import { CirclePlus, LogIn, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ const Header = () => {
                   <span className="hidden sm:inline">Login</span>
                </Button>
                <Button onClick={() => router.push('/signup')} className="px-3 sm:px-5 flex items-center py-5 bg-brand-color hover:bg-brand-green text-white rounded-md font-medium transition-colors">
-                  <span className="mr-0 sm:mr-2"><CirclePlus size={20} /></span>
+                  <span className="mr-0 sm:mr-2"><UserPlus size={20} /></span>
                   <span className="hidden sm:inline">Sign Up</span>
                </Button>
             </div>
