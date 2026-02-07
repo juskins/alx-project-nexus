@@ -2,6 +2,8 @@
 
 > A modern web application connecting students with on-campus job opportunities
 
+**🌐 Live Demo: [https://campus-jobs.netlify.app/](https://campus-jobs.netlify.app/)**
+
 ![Dashboard Preview](campus-connect/public/assets/dashboard-preview.png)
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
