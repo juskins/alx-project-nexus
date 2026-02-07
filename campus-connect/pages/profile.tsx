@@ -21,12 +21,6 @@ const Profile = () => {
    const stats = statsResponse?.data;
    const user = profileResponse?.data;
 
-   console.log('Profile Response:', profileResponse);
-   console.log('User Data:', user);
-   console.log('Stats Data:', stats);
-
-
-
    // Get university info from email domain
    const getUniversityInfo = () => {
       if (!user?.email) return 'University Student';

@@ -27,7 +27,6 @@ const Signup = () => {
       try {
          setIsSigningUp(true);
          const response = await api.post('/auth/register/', { role, email, password, name: username });
-         console.log(response.data);
          setIsSigningUp(false);
          toast.success('User created successfully, check your email to verify your account', { position: "top-right" });
          router.push('/login');
