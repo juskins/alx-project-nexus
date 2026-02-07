@@ -15,29 +15,29 @@ import { useFetch } from '@/hooks/useFetch';
 const Profile = () => {
    const router = useRouter();
    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-   const { data: stats, error: statsError, loading: statsLoading, refetch: statsRefetch } = useFetch<any>('/jobs/stats');
-   const { data: user, error: fetchError, loading: profileLoading, refetch } = useFetch<any>('/users/profile');
+   const { data: statsResponse, error: statsError, loading: statsLoading, refetch: statsRefetch } = useFetch<any>('/jobs/stats');
+   const { data: profileResponse, error: fetchError, loading: profileLoading, refetch } = useFetch<any>('/users/profile');
 
-   console.log('Stats:', stats);
-   console.log('User:', user);
+   const stats = statsResponse?.data;
+   const user = profileResponse?.data;
 
-   useEffect(() => {
-      refetch();
-      statsRefetch();
-   }, []);
+   console.log('Profile Response:', profileResponse);
+   console.log('User Data:', user);
+   console.log('Stats Data:', stats);
+
 
 
    // Get university info from email domain
    const getUniversityInfo = () => {
-      if (!user?.data?.email) return 'University Student';
-      const domain = user?.data?.email.split('@')[1];
+      if (!user?.email) return 'University Student';
+      const domain = user?.email.split('@')[1];
       return domain ? `${domain.split('.')[0]} University` : 'University Student';
    };
 
    // Get initials for avatar
    const getInitials = () => {
-      if (!user?.data?.name) return 'U';
-      return user?.data?.name
+      if (!user?.name) return 'U';
+      return user?.name
          .split(' ')
          .map((n: any) => n[0])
          .join('')
@@ -60,7 +60,7 @@ const Profile = () => {
    }
 
    // Error state
-   if (fetchError || !user?.data) {
+   if (fetchError || !user) {
       return (
          <DashboardLayout>
             <div className="max-w-7xl mx-auto px-8 py-12">
@@ -89,10 +89,10 @@ const Profile = () => {
                      <div className="flex justify-center mb-6">
                         <div className="relative">
                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gradient-to-br from-brand-color to-orange-400 flex items-center justify-center">
-                              {user?.data.avatar ? (
+                              {user?.avatar ? (
                                  <Image
-                                    src={user?.data.avatar}
-                                    alt={user?.data.name}
+                                    src={user?.avatar}
+                                    alt={user?.name}
                                     width={128}
                                     height={128}
                                     className="w-full h-full object-cover"
@@ -110,15 +110,15 @@ const Profile = () => {
 
                      {/* Name and University */}
                      <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{user?.data.name}</h1>
-                        <p className="text-sm text-gray-600 capitalize">{user?.data.role}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{user?.name}</h1>
+                        <p className="text-sm text-gray-600 capitalize">{user?.role}</p>
                         <p className="text-sm text-gray-500">{getUniversityInfo()}</p>
                      </div>
 
                      {/* Bio */}
-                     {user?.data.bio && (
+                     {user?.bio && (
                         <p className="text-sm text-gray-700 text-center leading-relaxed mb-6">
-                           {user?.data.bio}
+                           {user?.bio}
                         </p>
                      )}
 
@@ -131,11 +131,11 @@ const Profile = () => {
                      </button>
 
                      {/* Skills Section */}
-                     {user?.data?.skills && user?.data?.skills.length > 0 && (
+                     {user?.skills && user?.skills.length > 0 && (
                         <div className="mb-8">
                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills</h3>
                            <div className="flex flex-wrap gap-2">
-                              {user?.data?.skills.map((skill: string, index: number) => (
+                              {user?.skills.map((skill: string, index: number) => (
                                  <span
                                     key={index}
                                     className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200"
@@ -152,15 +152,15 @@ const Profile = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
                         <div className="space-y-3">
                            <a
-                              href={`mailto:${user?.data?.email}`}
+                              href={`mailto:${user?.email}`}
                               className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
                            >
                               <Mail className="w-4 h-4" />
-                              <span>{user?.data?.email}</span>
+                              <span>{user?.email}</span>
                            </a>
-                           {user?.data?.linkedin && (
+                           {user?.linkedin && (
                               <a
-                                 href={user?.data?.linkedin}
+                                 href={user?.linkedin}
                                  target="_blank"
                                  rel="noopener noreferrer"
                                  className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
@@ -169,9 +169,9 @@ const Profile = () => {
                                  <span>LinkedIn Profile</span>
                               </a>
                            )}
-                           {user?.data?.website && (
+                           {user?.website && (
                               <a
-                                 href={user?.data.website}
+                                 href={user.website}
                                  target="_blank"
                                  rel="noopener noreferrer"
                                  className="flex items-center gap-3 text-sm text-brand-color hover:text-brand-color/80 transition-colors"
@@ -184,18 +184,18 @@ const Profile = () => {
                      </div>
 
                      {/* Department */}
-                     {user?.data?.department && (
+                     {user?.department && (
                         <div className="mt-6 pt-6 border-t border-gray-200">
                            <p className="text-sm text-gray-600">Department</p>
-                           <p className="text-base font-semibold text-gray-900">{user?.data.department}</p>
+                           <p className="text-base font-semibold text-gray-900">{user.department}</p>
                         </div>
                      )}
 
                      {/* Student ID */}
-                     {user?.data?.studentId && (
+                     {user?.studentId && (
                         <div className="mt-4">
                            <p className="text-sm text-gray-600">Student ID</p>
-                           <p className="text-base font-semibold text-gray-900">{user?.data.studentId}</p>
+                           <p className="text-base font-semibold text-gray-900">{user.studentId}</p>
                         </div>
                      )}
                   </div>
@@ -204,11 +204,11 @@ const Profile = () => {
                {/* Right Content - Stats and History */}
                <div className="lg:col-span-2 space-y-6">
                   {/* Stats Cards */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                      {/* Completed Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats?.data?.completedJobs || 0}
+                           {stats?.completedJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Completed Jobs</div>
                      </div>
@@ -216,7 +216,7 @@ const Profile = () => {
                      {/* Ongoing Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats?.data?.ongoingJobs || 0}
+                           {stats?.ongoingJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Ongoing Jobs</div>
                      </div>
@@ -224,24 +224,24 @@ const Profile = () => {
                      {/* Posted Jobs */}
                      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                         <div className="text-3xl font-bold text-brand-color mb-1">
-                           {stats?.data?.postedJobs || 0}
+                           {stats?.postedJobs || 0}
                         </div>
                         <div className="text-sm text-gray-600">Posted Jobs</div>
                      </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-wrap w-full justify-between items-center gap-4">
                      <button
                         onClick={() => router.push('/find-jobs')}
-                        className="bg-brand-color hover:bg-brand-color/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                        className="bg-brand-color w-full flex-1 hover:bg-brand-color/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                      >
                         Find More Jobs
                      </button>
-                     {(user.role === 'employer' || user.role === 'admin') && (
+                     {(user?.role === 'employer') && (
                         <button
                            onClick={() => router.push('/post-job')}
-                           className="bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors"
+                           className="bg-white w-full flex-1 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors"
                         >
                            Post a New Job
                         </button>

@@ -278,14 +278,14 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSuccess }: EditProfileM
                      type="button"
                      onClick={onClose}
                      disabled={loading}
-                     className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                     className="flex-1 md:px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                   >
                      Cancel
                   </button>
                   <button
                      type="submit"
                      disabled={loading}
-                     className="flex-1 px-6 py-3 bg-brand-color hover:bg-brand-color/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                     className="flex-1 md:px-6 py-3 bg-brand-color hover:bg-brand-color/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                      {loading ? (
                         <>

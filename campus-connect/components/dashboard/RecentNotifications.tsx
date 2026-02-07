@@ -33,7 +33,7 @@ const RecentNotifications = () => {
     <section className="mb-8">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Notifications</h2>
       <div className="border relative border-gray-200 rounded-xl overflow-hidden">
-        <div className="bg-white/5 text-gray-900 text-xl font-semibold backdrop-blur-sm absolute top-0 left-0 w-full h-full flex items-center justify-center border border-gray-200 rounded-xl">Notification feature coming soon...</div>
+        <div className="bg-white/5 text-gray-900 text-xl font-semibold backdrop-blur-sm absolute top-0 left-0 m-auto text-center w-full h-full flex items-center justify-center border border-gray-200 rounded-xl">Notification feature coming soon...</div>
         {notifications.map((notification, index) => {
           const Icon = notification.icon;
           return (
