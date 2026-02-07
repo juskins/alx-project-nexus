@@ -34,20 +34,17 @@ export const register = async (req, res) => {
       const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
       const message = `Please verify your email by clicking: ${verificationUrl}`;
 
-      try {
-         await sendEmail({
-            email: user.email,
-            subject: 'Email Verification - Campus Connect',
-            message,
-            html: `
+      // Send email without awaiting to prevent signup delay
+      sendEmail({
+         email: user.email,
+         subject: 'Email Verification - Campus Connect',
+         message,
+         html: `
           <h1>Welcome to Campus Connect!</h1>
           <p>Please verify your email by clicking the link below:</p>
           <a href="${verificationUrl}">Verify Email</a>
         `,
-         });
-      } catch (error) {
-         console.error('Email send error:', error);
-      }
+      }).catch(error => console.error('Background Email send error:', error));
 
       res.status(201).json({
          success: true,
@@ -197,34 +194,32 @@ export const forgotPassword = async (req, res) => {
 
       const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please click: ${resetUrl}`;
 
-      try {
-         await sendEmail({
-            email: user.email,
-            subject: 'Password Reset - Campus Connect',
-            message,
-            html: `
+      // Send email without awaiting to improve response time
+      sendEmail({
+         email: user.email,
+         subject: 'Password Reset - Campus Connect',
+         message,
+         html: `
           <h1>Password Reset Request</h1>
           <p>You requested a password reset. Click the link below to reset your password:</p>
           <a href="${resetUrl}">Reset Password</a>
           <p>This link will expire in 10 minutes.</p>
           <p>If you didn't request this, please ignore this email.</p>
         `,
+      })
+         .then(() => console.log('Password reset email sent in background'))
+         .catch(async (error) => {
+            console.error('Background Password reset email error:', error);
+            // Optional: You could implement a retry logic or notification here
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save();
          });
 
-         res.status(200).json({
-            success: true,
-            message: 'Password reset email sent',
-         });
-      } catch (error) {
-         user.resetPasswordToken = undefined;
-         user.resetPasswordExpire = undefined;
-         await user.save();
-
-         res.status(500).json({
-            success: false,
-            message: 'Email could not be sent',
-         });
-      }
+      res.status(200).json({
+         success: true,
+         message: 'If a user with that email exists, a password reset link has been sent.',
+      });
    } catch (error) {
       res.status(500).json({
          success: false,
