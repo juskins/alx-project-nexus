@@ -15,7 +15,7 @@
 
 ## 📖 Overview
 
-**Campus Connect** is a comprehensive platform designed to bridge the gap between students seeking part-time employment and campus departments offering job opportunities. The application streamlines the job discovery, application, and management process within a university ecosystem.
+**Campus Connect** is a comprehensive platform designed to bridge the gap between students seeking part-time employment and nearby businesses and campus departments offering job opportunities. The application streamlines the job discovery, application, and management process within a university ecosystem.
 
 ### 🎯 What We're Building
 

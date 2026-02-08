@@ -2,6 +2,10 @@
 
 > A modern web application connecting students with on-campus job opportunities
 
+**🌐 Live Demo: [https://campus-jobs.netlify.app/](https://campus-jobs.netlify.app/)**
+
+![Dashboard Preview](./public/assets/dashboard-preview.png)
+
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
@@ -11,7 +15,7 @@
 
 ## 📖 Overview
 
-**Campus Connect** is a comprehensive platform designed to bridge the gap between students seeking part-time employment and campus departments offering job opportunities. The application streamlines the job discovery, application, and management process within a university ecosystem.
+**Campus Connect** is a comprehensive platform designed to bridge the gap between students seeking part-time employment and nearby campus businesses and departments offering job opportunities. The application streamlines the job discovery, application, and management process within a university ecosystem.
 
 ### 🎯 What We're Building
 
