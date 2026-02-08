@@ -1,9 +1,10 @@
 import User from "../models/User.js";
-import sendEmail from "../utils/sendEmail.js";
 import { generateToken } from "../utils/generateToken.js";
 import crypto from 'crypto';
+import sendEmail from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
+   console.log('Register request received for email:', req.body.email);
    try {
       const { name, email, password, role } = req.body;
 

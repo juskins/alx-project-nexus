@@ -1,27 +1,45 @@
-import nodemailer from 'nodemailer';
+import emailjs from '@emailjs/nodejs';
 
 const sendEmail = async (options) => {
-   // Explicit configuration often works better on Render to avoid port-blocking timeouts
-   const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // Use SSL for port 465
-      auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.EMAIL_PASSWORD,
-      },
-      connectionTimeout: 10000, // 10 seconds timeout
-   });
+   const serviceId = process.env.EMAILJS_SERVICE_ID;
+   const templateId = process.env.EMAILJS_TEMPLATE_ID;
+   const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+   const privateKey = process.env.EMAILJS_PRIVATE_KEY;
 
-   const mailOptions = {
-      from: process.env.EMAIL_USER, // Gmail often blocks if 'from' doesn't match the auth user
-      to: options.email,
-      subject: options.subject,
-      text: options.message,
-      html: options.html || options.message,
-   };
+   console.log(`Attempting to send email to: ${options.email} using EmailJS`);
 
-   await transporter.sendMail(mailOptions);
-}
+   if (!serviceId || !templateId || !publicKey || !privateKey) {
+      console.error('Missing EmailJS configuration in environment variables');
+      return;
+   }
+
+   try {
+      const templateParams = {
+         to_email: options.email,
+         subject: options.subject,
+         message: options.html || options.message,
+         // You can add more specific params here for your EmailJS template
+      };
+
+      const result = await emailjs.send(
+         serviceId,
+         templateId,
+         templateParams,
+         {
+            publicKey,
+            privateKey,
+         }
+      );
+
+      console.log('Email sent successfully via EmailJS');
+      console.log('EmailJS Result:', result.text);
+      return result;
+   } catch (error) {
+      console.error('sendEmail Error (EmailJS):', error);
+      throw error;
+   }
+};
 
 export default sendEmail;
+
+
