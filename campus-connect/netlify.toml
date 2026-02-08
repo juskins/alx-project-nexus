@@ -1,8 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next"
-
-# Note: No redirects needed here as Netlify's Next.js Runtime handles routing automatically.
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -14,3 +12,14 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[redirects]]
+  from = "/verify-email/*"
+  to = "/verify-email/[token]/"
+  status = 200
+
+# Optional: Catch-all for other potential client-side routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
